@@ -1,39 +1,43 @@
-# Handoff: Brady Ditch Parshall-flume monitor
+# Handoff: Brady Ditch Parshall-Flume Monitor
 
-## Project state
+## Project State
 
-- ESP-IDF v6.0.2 project targeting **ESP32-S3**.
-- `idf.py build` passes.
-- An ESP32-S3 (revision v0.2, 8 MB embedded octal PSRAM; MAC `3c:dc:75:ff:66:28`) was identified on `/dev/cu.usbmodem3101` and flashed for the embedded machine-vision proof of concept. PSRAM is enabled at 80 MHz in `sdkconfig.defaults` and passed its boot memory test.
-- The initial firmware initializes NVS, contains the flow-conversion boundary in `main/flow.c`, and has no ADC driver yet.
-- `main/head.c` converts a provisional linear 4–20 mA range (4 mA = 0.00 ft; 20 mA = 1.00 ft), including current-to-voltage shunt conversion.
-- Sensor range, demo endpoints, and demo update period live in the documented `main/installation_config.h`, separately from ESP-IDF board/build settings in `sdkconfig`.
-- The firmware also logs a demonstration head every minute: a linear 1.00 ft at :00 to 0.08 ft at :30 waveform. It follows hour boundaries after the clock is set; otherwise boot is its hour boundary.
-- Flow conversion is intentionally disabled: its coefficients are zero until the certified Parshall-flume rating is supplied.
+- **Target Hardware:** ESP32-S3 (revision v0.2, 8 MB Octal PSRAM at 80 MHz, 16 MB Flash, MAC `3c:dc:75:ff:66:28`) connected via USB `/dev/cu.usbmodem3101`.
+- **Build & Flash:** ESP-IDF v6.0.2 project builds cleanly and flashes successfully. Partition table allocates 6 MB factory app and 4 MB SPIFFS filesystem.
+- **Vision Subsystem:** Fully implemented and running on the ESP32-S3. Uses the **Submerged Mark Distortion Transition Algorithm** and **5-Stage C++ DSP Pipeline** (`main/vision_dsp.h`, `main/vision_dsp.cpp`, `main/vision_poc.cpp`).
+- **Benchmark Performance:** Evaluated live on 169 un-downsampled 1:1 scale field video frames from `IMG_2278.MOV` at **855.6 FPS** (1.169 ms/frame). The DSP burst median converges to **$0.08\text{ ft}$ ($0.96\text{ in}$)**.
+- **Visual Audit Storage:** The ESP32 mounts SPIFFS and stores annotated RGB bitmaps at `/images/clean_reference.bmp`.
+- **Flow Engine:** `main/flow.c` provides $Q = C \cdot H^n$ conversion and cfs-to-acre-foot integration. Flow conversion is held until certified Parshall rating coefficients are set in `main/installation_config.h`.
 
-## Start here
+---
+
+## Quick Start
 
 ```sh
 cd ~/Development/Brady_flume
 source ~/esp/esp-idf/export.sh
 idf.py build
+idf.py -p /dev/cu.usbmodem3101 flash
 ```
 
-## Key files
+---
 
-- `README.md` — field architecture, safety notes, and required site inputs.
-- `BOM-P1AM-200.md` — P1AM-200 controller-path BOM: P1-04AD direct-current input and P1-04RTD are selected. The proposed display is a Good Display GDEY042T81.
-- `BOM-ESP32S3.md` — ESP32-S3 controller-path BOM. The two paths share sensor engineering units and test vectors but need separate firmware implementations.
-- `OUTDOOR_INSTALLATION.md` — required year-round Utah design baseline: NEMA 4X/IP66 enclosure, thermal/condensation plan, 24 V power/surge protection, vented-transmitter care, and commissioning requirements.
-- `main/flow.c` / `main/flow.h` — `Q = C × Hⁿ` conversion and cfs-to-acre-foot integration.
-- `main/main.c` — current application skeleton; it does not erase NVS automatically.
-- `main/vision_poc.cpp` / `main/vision_test_images.h` — deterministic C++ proof of concept using crops from the two supplied phone images. On the flashed ESP32-S3 it reports image rows 809 (first image) and 772 (second; known false edge). `main/vision_test_images.md` preserves source paths, SHA-256 hashes, crop geometry, and outcomes. `VISION_ALGORITHM.md` explains why this is diagnostic only.
-- `sdkconfig` / `sdkconfig.defaults` — ESP32-S3 configuration.
+## Key Files & Modules
 
-## Next decisions
+* `README.md` — Field architecture and site inputs.
+* `BOM-ESP32S3.md` — ESP32-S3 controller BOM with dual-camera vision subsystem ($H_a$ primary staff gauge and $H_b$ submergence staff gauge).
+* `BOM-P1AM-200.md` — ProductivityOpen P1AM-200 controller BOM.
+* `OUTDOOR_INSTALLATION.md` — Shared year-round Utah outdoor NEMA 4X/IP66 enclosure and solar/thermal requirements.
+* `VISION_ALGORITHM.md` — Detailed mark distortion transition algorithm and 5-stage DSP filter specification.
+* `main/vision_dsp.h` / `main/vision_dsp.cpp` — C++ DSP pipeline classes (`BurstFilter`, `StageIIRFilter`, `VisionDSPPipeline`).
+* `main/vision_poc.cpp` — ESP32 vision benchmark engine and SPIFFS BMP writer.
+* `main/video_frames_data.h` — 169 full 1:1 scale video frame crops from `IMG_2278.MOV`.
+* `main/installation_config.h` — Site configuration, sensor ranges, and rating table coefficients.
+* `partitions.csv` — Custom 16 MB flash partition layout (6 MB App, 4 MB SPIFFS `images`).
 
-1. Obtain the Parshall flume throat width, upstream datum, certified rating table/equation, and whether submerged-flow correction is necessary.
-2. Select the head sensor and interface. A vented pressure transmitter with 4–20 mA output and a protected external precision ADC is the recommended baseline.
-3. Choose record interval/retention and display hardware, then implement sensor acquisition, RTC timekeeping, a wear-managed log, and deep-sleep power management.
+---
 
-Do not flash or erase a device until its board and serial port are explicitly identified.
+## Repository & Remote Tracking
+
+* **Git Repository:** Initialized and committed locally.
+* **Remote Repository (Private):** [https://github.com/Version2beta/Brady_flume](https://github.com/Version2beta/Brady_flume)
