@@ -27,9 +27,8 @@ idf.py -p /dev/cu.usbmodem3101 flash
 ## Key Files & Modules
 
 * `README.md` — Field architecture and required site inputs.
-* `BOM-ESP32S3.md` — Complete ESP32-S3 controller and camera head BOM (Seeed XIAO ESP32S3, OV2640 No IR-Cut, IP67 tube, MAX3490 RS-422, off-axis IR spotlight, conformal coating, desiccant).
-* `BOM-P1AM-200.md` — ProductivityOpen P1AM-200 controller BOM.
-* `OUTDOOR_INSTALLATION.md` — Shared year-round Utah outdoor NEMA 4X/IP66 enclosure and solar/thermal requirements.
+* `BOM-ESP32S3.md` — Complete ESP32-S3 controller and camera head BOM (Seeed XIAO ESP32S3, OV2640 No IR-Cut, IP67 junction box, MAX3490 RS-422, off-axis IR spotlight, conformal coating, desiccant).
+* `OUTDOOR_INSTALLATION.md` — Year-round Utah outdoor NEMA 4X/IP66 enclosure and solar/thermal requirements.
 * `VISION_ALGORITHM.md` — Detailed $0.01\text{ ft}$ mark distortion transition algorithm, 5-stage DSP filter specification, and off-axis IR optics rule.
 * `main/vision_dsp.h` / `main/vision_dsp.cpp` — C++ DSP pipeline classes (`BurstFilter`, `StageIIRFilter`, `VisionDSPPipeline`).
 * `main/vision_poc.cpp` — ESP32 vision benchmark engine and SPIFFS BMP writer.

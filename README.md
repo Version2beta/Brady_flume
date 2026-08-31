@@ -1,10 +1,10 @@
 # Brady Ditch flow monitor
 
-A field monitor for the Brady Ditch Company diversion at the Parshall flume. Its job is to measure upstream head, convert it to flow using the *site's certified Parshall-flume rating*, retain readings and annual volume, measure temperature, and show the current status locally. [`BOM-P1AM-200.md`](BOM-P1AM-200.md) and [`BOM-ESP32S3.md`](BOM-ESP32S3.md) cover the two controller paths; [`OUTDOOR_INSTALLATION.md`](OUTDOOR_INSTALLATION.md) defines their shared year-round Utah installation baseline.
+A field monitor for the Brady Ditch Company diversion at the Parshall flume. Its job is to measure upstream head, convert it to flow using the *site's certified Parshall-flume rating*, retain readings and annual volume, measure temperature, and show the current status locally. [`BOM-ESP32S3.md`](BOM-ESP32S3.md) defines the hardware components, and [`OUTDOOR_INSTALLATION.md`](OUTDOOR_INSTALLATION.md) defines the year-round Utah installation baseline.
 
 ## Initial scope
 
-This first buildable milestone establishes the ESP32-S3 firmware and a tested flow-integration boundary. A parallel ProductivityOpen P1AM-200 design uses Productivity 1000 I/O and will require a separate Arduino-compatible firmware implementation.
+This milestone establishes the ESP32-S3 firmware, non-contact dual camera machine vision subsystem, DSP filter pipeline, and a tested flow-integration boundary.
 
 - `main/flow.c` converts head to flow with `Q = C × Hⁿ` and integrates cfs over time to acre-feet.
 - `main/head.c` converts the selected linear transmitter range: 4 mA = 0.00 ft and 20 mA = 1.00 ft. It accepts either loop current or voltage plus the installed shunt resistance.

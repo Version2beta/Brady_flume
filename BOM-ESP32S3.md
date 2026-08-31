@@ -1,6 +1,6 @@
 # Brady Ditch monitor — ESP32-S3 bill of materials
 
-This BOM covers the ESP32-S3 controller path. The parallel [`BOM-P1AM-200.md`](BOM-P1AM-200.md) covers the P1AM-200 controller path. Both must meet the shared [outdoor installation baseline](OUTDOOR_INSTALLATION.md).
+This BOM covers the ESP32-S3 controller and camera vision system. It meets the [outdoor installation baseline](OUTDOOR_INSTALLATION.md).
 
 Status labels: **selected** = agreed design choice; **candidate** = appropriate class/part pending review; **TBD** = required information is missing.
 
@@ -34,4 +34,4 @@ Status labels: **selected** = agreed design choice; **candidate** = appropriate 
 
 Use an ESP32-S3 module on a purpose-built, conformally coated carrier board rather than placing the development board in the field. The carrier must provide a protected 24 V-to-logic power path, transient-protected field inputs, external precision ADC and RTD front ends, locking connectors or terminal blocks, a hardware watchdog/reset path, and a service/programming arrangement that does not compromise enclosure sealing.
 
-This design requires more custom analog, power, and surge engineering than the P1AM path. Keep sensor ranges, engineering units, display layout, record format, and flow-calculation test vectors identical between the two implementations.
+This design uses an ESP32-S3 main controller and Seeed Studio XIAO ESP32S3 camera head nodes connected over RS-422. Keep sensor ranges, engineering units, display layout, record format, and flow-calculation test vectors organized cleanly.
