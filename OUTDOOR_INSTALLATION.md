@@ -1,32 +1,46 @@
 # Outdoor installation baseline — Utah, year round
 
-This baseline applies to both controller paths. It is a design requirement, not a claim that an unselected part is suitable. Final ratings must be confirmed against the installation elevation, local temperature history, solar loading, enclosure location, and electrical code.
+This baseline applies to the Brady Ditch Parshall-flume monitor. It establishes the design requirements for year-round outdoor operation in Utah (-30 °C to +60 °C) across irrigation seasons (April–October) and winter shutdown.
 
-## Environmental and enclosure requirements
+---
 
-- Design electronics for an internal operating range of **-30 to +60 °C** at minimum; prefer individually rated **-40 to +85 °C** components. Direct solar loading can make a sealed enclosure substantially hotter than ambient.
-- Use a gasketed **NEMA 4X / IP66 minimum** outdoor enclosure with a UV-stable, impact-resistant viewing window. Prefer a light-colored enclosure, shaded mounting, and a rain/snow-shedding orientation.
-- Provide a pressure-equalizing hydrophobic vent, condensation strategy, drip loops, listed cable glands, strain relief, service loops, labeled terminals, and a lockable service disconnect.
-- **Nighttime Camera Optics & IR Lighting Requirement:** Because staff gauge paint is intentionally retroreflective, mounting an IR light source on the exact same axis as the camera lens causes a blinding white glare reflection that obliterates the black tick marks. The 850nm IR illuminator spotlight must be a standalone IP67 unit mounted **2–3 feet off-axis (to the side)** from the camera housing. This casts light at an angle, delivering high contrast on the graduation marks without sensor-blinding retroreflective glare.
-- A vented pressure-transmitter cable needs a dry, replaceable desiccant termination inside the enclosure. Do not seal its vent tube or allow condensation into it.
-- The display and window must be qualified together. Standard-temperature e-paper is not acceptable for year-round deployment unless the enclosure thermal design keeps it within its specified range. Add a front-light only if night reading is required.
+## Non-Contact Dual Camera & Enclosure Weatherproofing
 
-## Power, grounding, and surge protection
+### 1. Main Controller Solar/Battery Enclosure (NEMA 4X / IP66)
+- **Housing:** Gasketed NEMA 4X / IP66 fiberglass or polycarbonate enclosure in a light-reflective color with a top rain/snow shield.
+- **Pressure Equalization:** Equipped with a **Gore Hydrophobic Breathable Vent Gland** to equalize internal pressure during rapid solar heating and cooling without allowing liquid water or dust ingress.
+- **Internal Condensation Management:** Replaceable 10g silica gel desiccant packs inside the enclosure absorb internal humidity. Bottom-mounted drip loops and sealed terminal blocks prevent condensation from tracking along wiring.
+- **Display Window:** UV-stable impact-resistant viewing window for the 4.2" E-Ink display.
 
-- Use a 24 V battery and an appropriately rated solar charge controller. Fuse each branch at its source; use reverse-polarity protection, a service disconnect, and regulated DC conversion for logic power.
-- Use listed surge protection on incoming power and field cables. Bond enclosure, surge protectors, and the site grounding system according to the applicable electrical code; have the final grounding/lightning design reviewed by a qualified installer.
-- Keep sensor wiring physically and electrically separated from switched power and communications. Use shielded cable where the sensor manufacturer recommends it, and terminate shields according to the selected input-module guidance to avoid ground loops.
+### 2. Camera Head Nodes ($H_a$ Primary & $H_b$ Submergence Gauges)
+- **Enclosures:** Anodized aluminum **IP67 camera tube housings** ($30\text{ mm}$ inner diameter) with front optical glass windows and rear O-ring endcaps.
+- **Internal PCB Protection:** All internal circuit boards (Seeed XIAO ESP32S3 and MAX3490 RS-422 transceiver) are coated with **MG Chemicals 422B Silicone Conformal Coating** to prevent shorts or corrosion from ambient humidity.
+- **Anti-Fog Window Protection:** Mini 1-gram silica gel desiccant packets sealed inside each camera cylinder prevent internal moisture from fogging the optical glass window during freezing Utah winter snaps.
+- **Liquid-Tight Cable Entry:** IP68 PG7 compression cable glands seal the 4-wire shielded cable (12V Power + RS-422 pair) exiting the rear of the camera housing. External drip loops ensure rainwater falls away from the gland.
 
-## Measurement and records
+### 3. Night Optics & Standalone Off-Axis IR Spotlight
+- **CRITICAL OPTICAL REQUIREMENT:** Because staff gauge face paint is intentionally retroreflective, mounting an IR light source on the exact same axis as the camera lens causes a blinding white reflection that completely obliterates the black tick marks.
+- **Off-Axis Spotlight:** A standalone IP67 850nm IR Illuminator Spotlight is mounted **2–3 feet off-axis (to the side)** of each camera housing. This casts light at an angle, providing deep contrast on the black graduation marks without sensor-blinding glare.
+- **Gated Power:** The IR spotlight is energized via a MOSFET/relay for only 2 seconds per 15-minute logging burst to preserve solar battery power.
 
-- Select a 4–20 mA head transmitter with an environmental rating, accuracy, cable, venting method, and wetted materials appropriate to the site. Treat under-range/over-range loop current as a fault, not a water reading.
-- Use 3-wire Pt100 assemblies. The water probe must be 316L and IP68 with rated cable and connector practice. The selected air probe is Evolution Sensors P3A-S316-250-PX-3-PFXX-40-STWL: retain its 3 in, 1/4 in 316 SS sheath in a compression fitting below the enclosure, place its sensing end in a ventilated radiation shield, and route its 40 in PFA pigtail through a cable grip.
-- Install a downstream-level measurement point if free-flow submergence cannot be shown by site measurements. Preserve the prescribed `Ha` and `Hb` measurement locations in installation drawings.
-- Provide RTC/time synchronization, monotonically sequenced records, nonvolatile recovery of totals, watchdog recovery, and a documented calibration/maintenance procedure. Flow accounting remains disabled until the certified flume rating and submergence treatment are entered and reviewed.
+### 4. Temperature Sensors & Radiation Shield
+- **Air Temperature RTD:** Evolution Sensors P3A-S316-250-PX-3-PFXX-40-STWL 3-wire Class A Pt100 probe. The 3-inch 316 SS sheath is mounted in a stainless compression fitting below the enclosure, with the sensing tip housed inside a **6-plate ventilated solar radiation shield** to prevent direct sunlight from skewing air temperature readings.
+- **Water Temperature RTD:** IP68 316L SS 3-wire Pt100 probe with polyurethane cable, anchored in the flume sidewall stream.
 
-## Before field installation
+---
 
-1. Approve a wiring diagram, enclosure layout, BOM, and sensor calibration procedure.
-2. Verify every selected part's temperature, ingress, UV, surge, and supply-voltage ratings.
-3. Bench-test sensor faults, power interruption recovery, display readability, and data retention.
-4. Perform an enclosure thermal/condensation trial through a representative Utah summer and winter condition before relying on readings for accounting.
+## Power, Grounding, and Surge Protection
+
+- **Power Architecture:** 24V AGM/LiFePO4 battery charged via a properly sized solar panel and MPPT solar charge controller.
+- **Circuit Protection:** Fused branches on all battery and solar lines, reverse-polarity protection, and regulated DC-DC conversion for logic power.
+- **Surge & Lightning Protection:** Listed DIN-rail surge protectors on incoming solar and RS-422 field cables bonded to a copper grounding rod.
+- **Shielding:** 4-wire shielded twisted-pair cables for RS-422 camera communication, grounded at the main enclosure end to prevent ground loops.
+
+---
+
+## Pre-Deployment Weatherproofing Verification Checklist
+
+1. Verify conformal coating coverage on all camera node PCBs.
+2. Confirm fresh silica desiccant packs are installed inside main enclosure and camera cylinders.
+3. Check O-ring seals, PG7 cable gland compression, and external drip loops on all cables.
+4. Perform an enclosure thermal/condensation trial in a cold chamber before field deployment.

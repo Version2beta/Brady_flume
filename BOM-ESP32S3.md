@@ -23,8 +23,10 @@ Status labels: **selected** = agreed design choice; **candidate** = appropriate 
 | Water temperature | 316L stainless Pt100 RTD, Class A or 1/3-DIN, IP68, polyurethane cable; protected 3-wire RTD front end | RTD front end TBD | candidate | Use 3-wire wiring and field-rated input protection. |
 | Air temperature | 3-wire Class A Pt100, 1/4 in diameter × 3 in 316 SS sheath, 40 in PFA pigtail; ventilated radiation shield | Evolution Sensors P3A-S316-250-PX-3-PFXX-40-STWL | selected | Mount the sheath in a stainless compression fitting immediately below the enclosure, with the sensing end inside a radiation shield. Do not use a cable grip as the shaft clamp. |
 | Display | 4.2 in monochrome E Ink display, 400 × 300 pixels, SPI controller board | Good Display GDEY042T81 or equivalent | candidate | Mount behind a UV-stable enclosure window. It must meet the shared temperature requirement, or the enclosure needs thermal control. |
-| Enclosure | NEMA 4X / IP66 minimum outdoor enclosure, UV-resistant window, vent, and condensation management | TBD | TBD | Follow the shared outdoor baseline; select after enclosure thermal and wiring layout review. |
-| Power | 24 V battery, properly sized solar charge controller, fused/surge-protected DC conversion | TBD | TBD | Follow the shared outdoor baseline. |
+| Enclosure | NEMA 4X / IP66 minimum outdoor enclosure, UV-resistant window, vent, and condensation management | Fibox / Hammond NEMA 4X fiberglass | selected | Follows shared outdoor baseline. Light-colored enclosure with top shade shield. |
+| Hydrophobic Vent Gland | Gore Hydrophobic Breathable Vent Gland | Gore M12 Hydrophobic Vent | selected | Equalizes pressure inside main solar enclosure during temperature swings while blocking liquid water, snow, and dust ingress. |
+| Radiation Shield | 6-Plate Ventilated Solar Radiation Shield | Standard 6-Plate Louvered Shield | selected | Houses the 3-inch 316 SS air RTD sheath below the main enclosure to prevent direct solar radiation from skewing air temperature logs. |
+| Power | 24 V AGM/LiFePO4 battery, properly sized MPPT solar charge controller, fused/surge-protected DC-DC converter | Morningstar / Victron MPPT + 24V Battery | selected | Follows shared outdoor baseline. Powers main controller, 3-wire RTDs, RS-422 bus, and gated 2-second IR illuminator bursts. |
 
 ## ESP32-S3 rugged implementation
 
