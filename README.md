@@ -33,8 +33,8 @@ graph TD
         Hb_Cam[Hb Camera Box: Seeed XIAO ESP32S3 + OV2640 + MAX3490]
     end
 
-    Main_ESP32 <==>|4-Wire Shielded RS-422 Cable| Ha_Cam
-    Main_ESP32 <==>|4-Wire Shielded RS-422 Cable| Hb_Cam
+    Main_ESP32 <==>|6-Conductor Shielded Cable (RS-422 + 12V Power)| Ha_Cam
+    Main_ESP32 <==>|6-Conductor Shielded Cable (RS-422 + 12V Power)| Hb_Cam
     Main_ESP32 --->|Gated 12V MOSFET Power| Center_IR
 ```
 
