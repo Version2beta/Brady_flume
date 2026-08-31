@@ -80,3 +80,15 @@ Evaluated on 169 un-downsampled 1:1 scale video frames from field Live Photo cli
   * **$0.04\text{ ft}$ ($0.48\text{ in}$):** **4% of frames** (Deep wave dips)
 * **DSP Filtered Level Convergence:** **$\mathbf{0.08\text{ ft}}$ ($0.96\text{ inches}$)**
 * **Visual Audit Output:** Stored as 24-bit RGB bitmap at `/images/clean_reference.bmp` in internal SPIFFS flash partition.
+
+---
+
+## Physical Optics & Nighttime Lighting Rule
+
+**CRITICAL OPTICAL REQUIREMENT:**  
+Because staff gauge paint is intentionally retroreflective, mounting the 850nm IR light source on the exact same axis as the camera lens causes a blinding white reflection that completely obliterates the black tick marks.
+
+To ensure high-contrast night readings:
+* Use a **standalone IP67 850nm IR Illuminator Spotlight** mounted **2–3 feet off-axis (to the side)** of the camera housing.
+* This casts light at an angle, providing high-contrast black mark definition on the white gauge background without causing sensor-blinding retroreflective glare.
+* The IR spotlight is gated via a GPIO relay/MOSFET for the 2-second burst period to preserve solar battery power.
