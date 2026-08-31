@@ -1,13 +1,13 @@
 # Brady Ditch monitor — ESP32-S3 bill of materials
 
-This BOM covers the ESP32-S3 controller and camera vision system. It meets the [outdoor installation baseline](OUTDOOR_INSTALLATION.md).
+This BOM covers the intended ESP32-S3 controller and camera vision system. It meets the [outdoor installation baseline](OUTDOOR_INSTALLATION.md); it is not a statement of current firmware capability.
 
 Status labels: **selected** = agreed design choice; **candidate** = appropriate class/part pending review; **TBD** = required information is missing.
 
 | Function | Item / specification | Manufacturer / candidate | Status | Notes |
 | --- | --- | --- | --- | --- |
 | Main Controller | Main ESP32-S3 controller board in primary solar battery enclosure | Purpose-built ESP32-S3 carrier board | candidate | Handles main system clock, RTC timekeeping, 3-wire RTDs, flow rate integration, E-Ink display, SD logging, and RS-422 bus master communication. |
-| Development connection | Native USB serial/JTAG | `/dev/cu.usbmodem3101` on this Mac | observed | Provide a protected, sealed service access method in the field enclosure. |
+| Development connection | UART USB-C through WCH bridge | `/dev/cu.wchusbserial310` on this Mac | observed | Routine flash and console path. Reserve native USB for JTAG and planned MSC validation; provide a protected, sealed field service method. |
 | Head simulation | Firmware waveform, 1.000 ft at :00 and 0.080 ft at :30 | `main/installation_config.h` | selected | Retain as a commissioning/demo mode after analog hardware is assembled. |
 | Camera Head Microcontroller | Thumb-sized ESP32-S3 board ($21 \times 17.5\text{ mm}$) with 8 MB PSRAM | Seeed Studio XIAO ESP32S3 Sense | selected | Co-located inside IP67 camera head. Runs C++ vision algorithm and four-stage DSP locally on frame bursts; connects to MAX3490 transceiver over UART. |
 | Camera Sensor & Lens | OV2640 / OV5640 Night Vision (No IR-Cut) sensor + M12 8.0mm glass telephoto lens | OmniVision OV2640 / OV5640 No IR-Cut module | selected | 24-pin FPC connection to Seeed XIAO. M12 8.0mm glass lens provides narrow FOV focused on 1-foot staff gauge at 3.5 ft distance (14 px / 0.01 ft). |
@@ -15,10 +15,10 @@ Status labels: **selected** = agreed design choice; **candidate** = appropriate 
 | Camera Head Enclosure | Compact IP67 Polycarbonate Enclosure ($50 \times 50 \times 35\text{ mm}$) with Clear Front Lid | Hammond / Fibox IP67 Clear-Lid Junction Box | selected | Ultra-compact 2-inch square polycarbonate junction box with clear lid, silicone gasket, and mounting feet. Holds Seeed XIAO, camera, and MAX3490 IC. |
 | Board Moisture Protection | Silicone Conformal Coating | MG Chemicals 422B Silicone Conformal Coating | selected | Applied to Seeed XIAO board and MAX3490 transceiver PCB inside camera box to prevent corrosion/shorts from humidity. |
 | Lens Anti-Fog Protection | Mini 1g Silica Gel Desiccant Packets | Sealed Silica Gel Desiccant Packets | selected | Sealed inside clear-lid junction box behind window to absorb internal air moisture and prevent cold-weather lens fogging. |
-| Waterproof Cable Glands | IP68 PG7 Compression Cable Glands | IP68 PG7 Liquid-tight Cable Gland | selected | Mounts in bottom wall of camera box. Seals 4-wire shielded cable (12V Power + RS-422 Pair) with external drip loop. |
+| Waterproof Cable Glands | IP68 PG7 Compression Cable Glands | IP68 PG7 Liquid-tight Cable Gland | selected | Mounts in bottom wall of camera box. Seals 6-conductor shielded cable (12V power plus two RS-422 pairs) with an external drip loop. |
 | $H_a$ Camera Head Assembly | Primary upstream staff gauge camera head node | Compact IP67 clear-lid camera node | selected | Mounts at left/upstream end of cross-arm directly over $H_a$ staff gauge. Transmits computed level ($0.08\text{ ft}$) and JPEGs over RS-422 bus. |
 | $H_b$ Submergence Camera Assembly | Secondary throat staff gauge camera head node | Compact IP67 clear-lid camera node | selected | Mounts at right/downstream end of cross-arm directly over $H_b$ throat gauge for Parshall submergence detection over RS-422 bus. |
-| RS-422 Communication Bus | 3.3V full-duplex RS-422 transceiver IC (MAX3490 / ADM3491) | MAX3490 / ADM3491 ICs | selected | Connects camera nodes to main controller over 4-wire shielded cable up to 4,000 feet at 1 Mbps. |
+| RS-422 Communication Bus | 3.3V full-duplex RS-422 transceiver IC (MAX3490 / ADM3491) | MAX3490 / ADM3491 ICs | selected | Uses two twisted pairs from the 6-conductor shielded cable to connect camera nodes to the main controller up to 4,000 feet at 1 Mbps. |
 | Shared Center Night IR Illuminator | Single Standalone IP67 850nm IR Illuminator Spotlight (Center-Mounted) | 12V/24V 850nm IP67 IR Spotlight (Qty 1) | selected | **CRITICAL OPTICS NOTE:** Mounted in the **CENTER of the cross-arm bar** (opposite flume throat between cameras). Its $60^\circ$ flood beam shines outward 1.5–2.0 ft off-axis onto both $H_a$ (left) and $H_b$ (right) staff gauges simultaneously, providing high contrast without retroreflective glare in either camera lens. Gated via GPIO relay for 2-second bursts. |
 | Loop input | Protected 4–20 mA receiver, 150 Ω 0.1% low-tempco shunt, RC filter, external precision ADC | ADC TBD | candidate | 4–20 mA becomes 0.60–3.00 V. Include a field-rated input protector and loop fault detection; do not use the ESP32 internal ADC. |
 | Water temperature | 316L stainless Pt100 RTD, Class A or 1/3-DIN, IP68, polyurethane cable; protected 3-wire RTD front end | RTD front end TBD | candidate | Use 3-wire wiring and field-rated input protection. |

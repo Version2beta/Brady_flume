@@ -40,14 +40,17 @@ The Brady Ditch Flume Monitor is an intended solar-powered water recorder for a 
   Year-round Utah installation baseline (-30 °C to +60 °C), NEMA 4X solar enclosure layout, Gore hydrophobic vent, central 24V-to-12V power distribution, 3-wire Pt100 RTD radiation shield, and the 3.5-foot cross-arm mounting geometry.
 
 * [`VISION_ALGORITHM.md`](VISION_ALGORITHM.md)  
-  Technical specification for the $0.01\text{ ft}$ Submerged Mark Distortion Transition algorithm, off-axis IR lighting physics rule, four-stage C++ DSP pipeline (`BurstFilter`, `StageIIRFilter`, `VisionDSPPipeline`), and visual audit image retention strategy.
+  Technical specification for the $0.01\text{ ft}$ Submerged Mark Distortion Transition algorithm, off-axis IR lighting physics rule, and four-stage C++ DSP pipeline (`BurstFilter`, `StageIIRFilter`, `VisionDSPPipeline`).
+
+* [`DATA_AND_AUDIT_RECORDS.md`](DATA_AND_AUDIT_RECORDS.md)
+  Planned CSV records, audit-image selection and retention, storage tiers, and USB retrieval; clearly separated from current proof-of-concept behavior.
 
 * [`HANDOFF.md`](HANDOFF.md)  
   Current system status, quick start build/flash commands, firmware module index, and hardware handoff details.
 
 ---
 
-## System Architecture Diagram
+## Intended System Architecture Diagram
 
 ```mermaid
 graph TD
@@ -55,7 +58,7 @@ graph TD
         Main_ESP32[ESP32-S3 Main Controller Node]
         Battery[24V AGM/LiFePO4 Solar Battery]
         Solar_MPPT[MPPT Solar Charge Controller]
-        EPaper[4.2" E-Ink Status Display]
+        EPaper[4.2-inch E-Ink Status Display]
         Gore_Vent[Gore Hydrophobic Vent Gland]
         RTDs[3-Wire Pt100 Air & Water RTDs]
     end
@@ -80,8 +83,8 @@ graph TD
 | Water Head | Primary non-contact camera vision on ESP32-S3 using mark-distortion transition tracking and DSP burst filtering on $H_a$ staff gauge. |
 | Flow Rate | Determine submergence from simultaneous upstream ($H_a$) and downstream ($H_b$) dual camera vision readings; apply certified free-flow limit and submerged-flow correction when required. |
 | Temperature | 316L stainless Pt100 RTD, Class A, IP68 with 3-wire interface; second RTD in a 6-plate solar radiation shield for air temperature. |
-| Historic Data | Timestamped CSV records and 15-min annotated JPEG audit photos in a wear-leveled MicroSD card / SPIFFS ring log. |
-| Field Retrieval | **Plug-and-Play USB Mass Storage (MSC) Drive Volume:** Connecting a USB-C cable from a laptop mounts the MicroSD filesystem directly as a USB flash drive (`BRADY_FLUME/`), enabling drag-and-drop log and JPEG audit image downloads. |
+| Historic Data | Planned timestamped CSV records and 15-min annotated JPEG audit photos; see [data and audit records](DATA_AND_AUDIT_RECORDS.md). |
+| Field Retrieval | Planned USB Mass Storage (MSC) access to the MicroSD filesystem as `BRADY_FLUME/`; see [data and audit records](DATA_AND_AUDIT_RECORDS.md). |
 | Status Display | 4.2" low-power E-Ink display showing head, flow, daily/annual volume, temperature, battery, and sensor health. |
 | Solar Power | 24V AGM/LiFePO4 battery through a Mean Well 24V-to-12V industrial buck converter and MPPT solar charge controller. |
 

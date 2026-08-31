@@ -43,7 +43,7 @@ This baseline applies to the Brady Ditch Parshall-flume monitor. It establishes 
 - **Enclosures:** Compact IP67 polycarbonate enclosures ($50 \times 50 \times 35\text{ mm}$) with clear front viewing lids and silicone perimeter gaskets.
 - **Internal PCB Protection:** All internal circuit boards (Seeed XIAO ESP32S3 and MAX3490 RS-422 transceiver) are coated with **MG Chemicals 422B Silicone Conformal Coating** to prevent shorts or corrosion from ambient humidity.
 - **Anti-Fog Window Protection:** Mini 1-gram silica gel desiccant packets sealed inside each camera junction box prevent internal moisture from fogging the clear front lid during freezing Utah winter snaps.
-- **Liquid-Tight Cable Entry:** IP68 PG7 compression cable glands seal the 4-wire shielded cable (12V Power + RS-422 pair) exiting the bottom wall of the camera box. External drip loops ensure rainwater falls away from the gland.
+- **Liquid-Tight Cable Entry:** IP68 PG7 compression cable glands seal the 6-conductor shielded cable (12V power plus two RS-422 pairs) exiting the bottom wall of the camera box. External drip loops ensure rainwater falls away from the gland.
 
 ### 3. Center Shared Night Optics & Off-Axis IR Spotlight
 - **CRITICAL OPTICAL REQUIREMENT:** Because staff gauge face paint is intentionally retroreflective, mounting an IR light source on the exact same axis as the camera lens causes a blinding white glare reflection that completely obliterates the black tick marks.
@@ -69,17 +69,6 @@ This baseline applies to the Brady Ditch Parshall-flume monitor. It establishes 
 - **Circuit Protection:** Fused branches on all 24V and 12V lines, reverse-polarity diode protection, and thermal shutdown.
 - **Surge & Lightning Protection:** Listed DIN-rail surge protectors on incoming solar and RS-422 field cables bonded to a copper grounding rod.
 - **Cable Shielding:** 6-conductor (3 twisted-pair) 22 AWG outdoor shielded cable carries full-duplex RS-422 data pairs and clean 12V power to the cross-arm assembly, grounded at the main enclosure end to prevent ground loops.
-
----
-
-## Measurement and Audit Records
-
-- **Visual Audit Image Retention:** For every 15-minute logging burst, the ESP32 selects the single representative median frame, annotates it with a red waterline at the $0.01\text{ ft}$ mark, and saves it as a 15 KB JPEG (`/images/audit_YYYYMMDD_HHMMSS_0.08ft.jpg`).
-- **Primary SD Card Storage ($32\text{ GB}$):** Retains over 100 years of visual audit photos (300 MB per 7-month irrigation season).
-- **Internal Flash Fallback (4 MB SPIFFS):** FIFO ring buffer retaining the last 250 audit photos (~2.5 days) if no SD card is present.
-- **Plug-and-Play USB Mass Storage (MSC) Retrieval:** When a technician plugs a USB-C cable from a laptop into the ESP32-S3, the MicroSD card mounts directly as a standard USB flash drive volume (`BRADY_FLUME/`). Technicians drag-and-drop CSV flow logs and JPEG audit photos onto their laptop without needing terminal commands or custom software.
-- **Temperature Sensors:** Air temperature Pt100 RTD in a 6-plate solar radiation shield; water temperature Pt100 RTD in flume sidewall.
-- **Time Synchronization & Flow Accounting:** RTC timekeeping with nonvolatile total recovery. Flow accounting remains disabled until certified Parshall rating coefficients are entered.
 
 ---
 

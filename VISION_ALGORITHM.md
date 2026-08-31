@@ -44,7 +44,7 @@ The primary algorithm operates directly on the printed staff marks:
                            │ 1-Second Burst Result
                            ▼
 ┌──────────────────────────────────────────────────────────┐
-│ STAGE 3: IIR Exponential Moving Average / Kalman Filter  │
+│ STAGE 3: IIR Exponential Moving Average                  │
 │ Smooths minute-to-minute hydrological flow transitions   │
 └──────────────────────────┬───────────────────────────────┘
                            │ Continuous Stage Reading
@@ -72,10 +72,10 @@ The primary algorithm operates directly on the printed staff marks:
 
 ## ESP32-S3 Hardware Benchmark Observation
 
-The current worktree was built, flashed, and run against its embedded 169-frame, 120 × 200 grayscale corpus on the documented ESP32-S3:
+Firmware revision `ff2602b` was built, flashed, and run against its embedded 169-frame, 120 × 200 grayscale corpus on the documented ESP32-S3:
 
 * **WCH UART console:** **$854.8\text{ Frames Per Second}$** ($1.170\text{ ms}$ per frame)
-* **Native USB console:** **$1555.3\text{ Frames Per Second}$** ($0.643\text{ ms}$ per frame)
+* **Native USB console (earlier observation):** **$1555.3\text{ Frames Per Second}$** ($0.643\text{ ms}$ per frame); this has not been rerun for `ff2602b`.
 * **Level Distribution:**
   * **$0.08\text{ ft}$:** 116 frames (68%)
   * **$0.07\text{ ft}$:** 33 frames (19%)
@@ -89,22 +89,9 @@ Benchmark timing currently includes a progress log every ten frames, so console 
 
 ---
 
-## Visual Audit Image Retention Strategy
+## Target Audit Image Selection
 
-1. **Representative Median Frame Selection (1 Photo / Burst):**  
-   Rather than storing every frame in a 20-frame camera burst, the ESP32 selects **the single representative median frame** (the frame whose calculated level matches $H_{\text{median}}$). It annotates the frame with a red waterline at the $0.01\text{ ft}$ transition mark and saves it with a timestamped filename:
-   `/images/audit_YYYYMMDD_HHMMSS_0.08ft.jpg` (~15 KB JPEG).
-
-2. **Primary Storage — MicroSD Card ($32\text{ GB}$):**  
-   * **Daily Rate:** 96 bursts/day (15-min interval) $\approx 1.44\text{ MB / day}$.
-   * **7-Month Irrigation Season (April–October):** $\approx 300\text{ MB}$ total.
-   * **Capacity:** A $32\text{ GB}$ MicroSD card holds over **100 years of visual audit photos**.
-
-3. **Fallback Storage — 4 MB Internal SPIFFS Flash Partition:**  
-   If no MicroSD card is present, internal flash operates as a FIFO ring buffer retaining the last **250 audit photos (~2.5 days)** for USB service retrieval.
-
-4. **Field Audit Retrieval:**  
-   Field technicians connect a laptop over USB-C (`/dev/cu.usbmodem3101`) to pull audit images for visual verification against manual logs.
+For each intended camera burst, retain the single frame whose calculated level matches the burst median and annotate it with the detected $0.01\text{ ft}$ transition. Storage, retention, CSV records, and USB retrieval are specified separately in [Intended Data and Audit Records](DATA_AND_AUDIT_RECORDS.md); none are current firmware features.
 
 ---
 
