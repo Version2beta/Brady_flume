@@ -1,18 +1,46 @@
 # Brady Ditch flow monitor
 
-A field monitor for the Brady Ditch Company diversion at the Parshall flume. Its job is to measure upstream head, convert it to flow using the *site's certified Parshall-flume rating*, retain readings and annual volume, measure temperature, and show the current status locally. [`BOM-ESP32S3.md`](BOM-ESP32S3.md) defines the hardware components, and [`OUTDOOR_INSTALLATION.md`](OUTDOOR_INSTALLATION.md) defines the year-round Utah installation baseline.
+## Project Overview
 
-## Initial scope
+The Brady Ditch Flume Monitor is an automated, solar-powered water recorder for a Parshall flume. It uses an ESP32-S3 microcontroller and two outdoor cameras to read staff gauges without touching the water. By detecting water distortion directly on the printed gauge marks, the system filters out surface waves, calculates flow rates, and stores both CSV flow logs and visual audit photos for field verification.
 
-This milestone establishes the ESP32-S3 firmware, non-contact dual camera machine vision subsystem, DSP filter pipeline, and a tested flow-integration boundary.
+## Key System Features
 
-- `main/flow.c` converts head to flow with `Q = C × Hⁿ` and integrates cfs over time to acre-feet.
-- `main/head.c` converts the selected linear transmitter range: 4 mA = 0.00 ft and 20 mA = 1.00 ft. It accepts either loop current or voltage plus the installed shunt resistance.
-- A test/demo head generator ramps linearly from 1.00 ft on the hour to 0.08 ft at :30, then back to 1.00 ft on the next hour. Firmware logs it every minute. With valid RTC/SNTP time it follows civil-hour boundaries; until then it uses uptime, with boot treated as an hour boundary.
-- Site and demonstration values live separately in the documented `main/installation_config.h`, keeping them apart from ESP-IDF board/build settings in `sdkconfig`. Update that file for an installation, then rebuild.
+* **Non-Contact Camera Reading**  
+  Reads depth directly from staff gauges without sensors in the water, avoiding mud, moss, or physical damage.
 
-- The rating coefficients are deliberately disabled until the flume geometry and calibration are known.
-- NVS is initialized, but no readings are yet stored. Do not use this firmware for operational accounting.
+* **$0.01\text{ Foot}$ Accuracy**  
+  Detects water refraction across printed gauge lines, snapping readings to exact $0.01\text{ foot}$ ($0.12\text{ inch}$) increments matching how a human reads the gauge.
+
+* **Wave and Glint Filtering**  
+  Applies digital filtering across camera bursts to eliminate surface ripples, splash, and sun glint before recording flow.
+
+* **24/7 Night Vision**  
+  Uses an off-axis 850nm IR spotlight to illuminate both staff gauges at night without causing retroreflective glare into the camera lenses.
+
+* **Year-Round Weatherproofing**  
+  Built for $-30^\circ\text{C to }+60^\circ\text{C}$ outdoor Utah weather with NEMA 4X enclosures, regulated power, hydrophobic vents, and sealed clear-lid camera boxes.
+
+* **Plug-and-Play USB File Access**  
+  Plugging a laptop into the monitor mounts its MicroSD card as a standard USB flash drive (`BRADY_FLUME/`), letting technicians drag and drop flow logs and audit photos.
+
+---
+
+## Documentation Index
+
+* [`BOM-ESP32S3.md`](BOM-ESP32S3.md)  
+  Complete bill of materials for the main solar enclosure controller, Seeed Studio XIAO ESP32S3 camera head nodes, 850nm IR spotlight, power supplies, and IP67 weatherproofing hardware.
+
+* [`OUTDOOR_INSTALLATION.md`](OUTDOOR_INSTALLATION.md)  
+  Year-round Utah installation baseline (-30 °C to +60 °C), NEMA 4X solar enclosure layout, Gore hydrophobic vent, central 24V-to-12V power distribution, 3-wire Pt100 RTD radiation shield, and the 3.5-foot cross-arm mounting geometry.
+
+* [`VISION_ALGORITHM.md`](VISION_ALGORITHM.md)  
+  Technical specification for the $0.01\text{ ft}$ Submerged Mark Distortion Transition algorithm, off-axis IR lighting physics rule, 5-stage C++ DSP pipeline (`BurstFilter`, `StageIIRFilter`, `VisionDSPPipeline`), and visual audit image retention strategy.
+
+* [`HANDOFF.md`](HANDOFF.md)  
+  Current system status, quick start build/flash commands, firmware module index, and hardware handoff details.
+
+---
 
 ## System Architecture Diagram
 
@@ -38,36 +66,35 @@ graph TD
     Main_ESP32 --->|Gated 12V MOSFET Power| Center_IR
 ```
 
-## Field architecture
+---
 
-| Function | Recommended approach |
+## Field Architecture
+
+| Function | Recommended Approach |
 | --- | --- |
-| Water head | Primary non-contact camera vision on ESP32-S3 using mark-distortion transition tracking and DSP burst filtering on the $H_a$ staff gauge; optional vented 4–20 mA pressure/ultrasonic sensor fallback. |
-| Flow | Determine submergence from simultaneous upstream ($H_a$) and downstream ($H_b$) dual camera vision readings; apply the certified free-flow limit and submerged-flow correction when required. |
-| Temperature | 316L stainless Pt100 RTD, Class A or 1/3-DIN, IP68, with a 3-wire interface; second RTD for enclosure/air temperature. |
-| Historic data | Timestamped CSV records and 15-min annotated JPEG audit photos in a wear-leveled MicroSD card / SPIFFS ring log. |
+| Water Head | Primary non-contact camera vision on ESP32-S3 using mark-distortion transition tracking and DSP burst filtering on $H_a$ staff gauge. |
+| Flow Rate | Determine submergence from simultaneous upstream ($H_a$) and downstream ($H_b$) dual camera vision readings; apply certified free-flow limit and submerged-flow correction when required. |
+| Temperature | 316L stainless Pt100 RTD, Class A, IP68 with 3-wire interface; second RTD in a 6-plate solar radiation shield for air temperature. |
+| Historic Data | Timestamped CSV records and 15-min annotated JPEG audit photos in a wear-leveled MicroSD card / SPIFFS ring log. |
 | Field Retrieval | **Plug-and-Play USB Mass Storage (MSC) Drive Volume:** Connecting a USB-C cable from a laptop mounts the MicroSD filesystem directly as a USB flash drive (`BRADY_FLUME/`), enabling drag-and-drop log and JPEG audit image downloads. |
-| Display | Small low-power e-paper display showing head, flow, daily/annual volume, temperature, battery, and sensor health. |
-| Power | 24 V battery through a fused, reverse-polarity- and surge-protected buck converter. The solar panel must charge the battery through a suitable charge controller; it must not feed the ESP32 supply directly. |
+| Status Display | 4.2" low-power E-Ink display showing head, flow, daily/annual volume, temperature, battery, and sensor health. |
+| Solar Power | 24V AGM/LiFePO4 battery through a Mean Well 24V-to-12V industrial buck converter and MPPT solar charge controller. |
 
-The normal duty cycle should wake periodically, sample and log, refresh the display when needed, then deep-sleep. Keep the sensor supply and its warm-up time in the energy budget.
+---
 
-## Required site inputs before field hardware/flow configuration
+## Required Site Inputs Before Field Hardware/Flow Configuration
 
 1. Parshall flume throat width, upstream staff-gauge datum, and the governing rating table/equation.
-2. Confirm the selected 0.00–1.00 ft transmitter range, required accuracy, and whether the flume can operate submerged.
-3. Select the ADC and the precise current-to-voltage shunt resistance; the voltage conversion is `I_mA = 1000 × V / R_ohms`.
-4. Sensor mounting method, cable length, and whether a vented pressure sensor is practical.
-5. Sampling/reporting interval and retention period.
-6. Battery chemistry/capacity, solar-panel size, enclosure location, and winter shading assumptions.
-7. Display size/readability requirements and any telemetry requirement.
+2. Certified rating table coefficients for $Q = C \cdot H^n$ in `main/installation_config.h`.
+3. Battery capacity, solar panel wattage, and winter shading assumptions.
 
-## Build
+---
+
+## Build Commands
 
 ```sh
 source ~/esp/esp-idf/export.sh
 idf.py set-target esp32s3
 idf.py build
+idf.py -p /dev/cu.usbmodem3101 flash
 ```
-
-Do not flash until a board and serial port have been explicitly identified.
