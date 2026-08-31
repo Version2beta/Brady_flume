@@ -14,6 +14,27 @@ This baseline applies to the Brady Ditch Parshall-flume monitor. It establishes 
 
 ### 2. Camera Head Nodes ($H_a$ Primary & $H_b$ Submergence Gauges)
 - **Unified Cross-Arm Mounting Bar:** Both camera junction boxes ($H_a$ and $H_b$) and the single IR spotlight are mounted on a **single 3.5-foot rigid cross-arm support bar** positioned **3.5 feet ($42\text{ inches}$) out from the flume sidewall**.
+
+```
+          TOP VIEW: 3.5-FOOT CROSS-ARM BAR MOUNTING GEOMETRY
+
+       ┌──────────────────────────────────────────────────────────────┐
+       │ 3.5-Foot Cross-Arm Support Bar (3.5 ft Out from Flume Wall)  │
+       └───┬──────────────────────────┬───────────────────────────┬───┘
+           │                          │                           │
+           ▼                          ▼                           ▼
+    ┌─────────────┐         ┌───────────────────┐          ┌─────────────┐
+    │ Ha Cam Box  │         │ Single Center     │          │ Hb Cam Box  │
+    │ (Upstream)  │         │ 850nm Spotlight   │          │(Downstream) │
+    └──────┬──────┘         └─────────┬─────────┘          └──────┬──────┘
+           │ 30° Off-Axis             │ 60° Flood Beam            │ 30° Off-Axis
+           │ Line of Sight            │ Shines Left & Right       │ Line of Sight
+           ▼                          ▼                           ▼
+    ═══════╧══════════════════════════╧═══════════════════════════╧═════════
+    FLUME: Ha Gauge               Flume Throat                 Hb Gauge
+    ═══════════════════════════════════════════════════════════════════════
+```
+
 - **Flume Layout Geometry:**  
   * **$H_a$ Upstream Camera Box:** Mounted at the **left/upstream end** of the cross-arm bar, directly opposite the $H_a$ primary staff gauge.
   * **$H_b$ Downstream Camera Box:** Mounted at the **right/downstream end** of the cross-arm bar, directly opposite the $H_b$ throat submergence staff gauge.
