@@ -1,6 +1,7 @@
 #include "head.h"
 
 #include <math.h>
+#include <stddef.h>
 
 bool head_from_current_ma(float current_ma, float *head_ft)
 {

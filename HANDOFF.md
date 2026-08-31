@@ -2,14 +2,13 @@
 
 ## Project State
 
-- **Target Hardware:** ESP32-S3 (revision v0.2, 8 MB Octal PSRAM at 80 MHz, 16 MB Flash, MAC `3c:dc:75:ff:66:28`) connected via USB `/dev/cu.usbmodem3101`.
+- **Target Hardware:** ESP32-S3 (revision v0.2, 8 MB Octal PSRAM at 80 MHz, 16 MB Flash, MAC `3c:dc:75:ff:66:28`). Routine development uses the board's UART USB-C port through the WCH bridge at `/dev/cu.wchusbserial310`; the native USB port is reserved for USB/JTAG and planned MSC validation.
 - **Build & Flash:** ESP-IDF v6.0.2 project builds cleanly and flashes successfully. Partition table allocates 6 MB factory app and 4 MB SPIFFS filesystem.
-- **Vision Subsystem:** Fully implemented and running on the ESP32-S3. Uses the **Submerged Mark Distortion Transition Algorithm** (refined to $0.01\text{ ft}$ hundredths-of-a-foot resolution per OpenChannelFlow standards) and **5-Stage C++ DSP Pipeline** (`main/vision_dsp.h`, `main/vision_dsp.cpp`, `main/vision_poc.cpp`).
-- **Benchmark Performance:** Evaluated live on 169 un-downsampled 1:1 scale field video frames from `IMG_2278.MOV` at **855.6 FPS** (1.169 ms/frame). The DSP burst median converges to **$0.08\text{ ft}$ ($0.96\text{ in}$)** (68% mode frequency).
-- **Multi-Node Architecture:** $H_a$ primary and $H_b$ submergence camera head nodes use Seeed Studio XIAO ESP32S3 Sense boards inside compact IP67 clear-lid polycarbonate junction boxes ($50 \times 50 \times 35\text{ mm}$) with MAX3490 RS-422 transceivers, communicating over a 4-wire shielded cable to the main solar enclosure.
-- **Night Optics & Lighting:** A single shared off-axis IP67 850nm IR spotlight mounted 2–3 feet to the side of the flume illuminates both $H_a$ and $H_b$ staff gauges simultaneously without causing sensor-blinding glare.
-- **Visual Audit Storage & Field Retrieval:** The ESP32 mounts SPIFFS / MicroSD and stores 24-bit RGB annotated audit bitmaps at `/images/clean_reference.bmp`. When plugged into a laptop over USB-C, the ESP32-S3 operates as a **USB Mass Storage Class (MSC) flash drive**, allowing plug-and-play drag-and-drop file downloads (`BRADY_FLUME/`).
-- **Flow Engine:** `main/flow.c` provides $Q = C \cdot H^n$ conversion and cfs-to-acre-foot integration. Flow conversion is held until certified Parshall rating coefficients are set in `main/installation_config.h`.
+- **Vision Proof of Concept:** The current application processes the embedded 169-frame, 120 × 200 grayscale corpus using fixed crop geometry and attempts to write one annotated BMP to a pre-provisioned SPIFFS partition. It is not camera-capture, field-commissioned, or dual-camera firmware.
+- **Latest Hardware Validation:** The current dirty worktree was built, flashed, and monitored through the WCH UART bridge. It booted on the documented ESP32-S3, completed the embedded 169-frame benchmark at 854.8 FPS (1.170 ms/frame), reported writing `/images/clean_reference.bmp`, and left flow conversion disabled pending calibration. This validates the complete fixed-corpus proof-of-concept loop on hardware, including the extracted detector; it does not prove camera capture, field accuracy, or retrieval of the SPIFFS artifact. The earlier 1555.3-FPS native-USB console observation has not been rerun after these changes. Benchmark timing includes periodic console logging, so it is not algorithm-only throughput.
+- **Planned Multi-Node Architecture:** The BOM describes $H_a$ and $H_b$ ESP32-S3 camera nodes communicating with the main enclosure over RS-422. That protocol and camera-node firmware are not present in this repository.
+- **Planned Field Services:** SD/CSV logging, USB MSC retrieval, RTC, display, and LTE-M telemetry are design goals; the current component list registers only `esp_timer`, `nvs_flash`, and SPIFFS.
+- **Flow Engine:** `main/flow.c` provides $Q = C \cdot H^n$ conversion and cfs-to-acre-foot integration. Flow conversion remains disabled until certified Parshall rating coefficients are configured in firmware.
 
 ---
 
@@ -19,7 +18,7 @@
 cd ~/Development/Brady_flume
 source ~/esp/esp-idf/export.sh
 idf.py build
-idf.py -p /dev/cu.usbmodem3101 flash
+idf.py -p /dev/cu.wchusbserial310 flash
 ```
 
 ---
@@ -29,11 +28,13 @@ idf.py -p /dev/cu.usbmodem3101 flash
 * `README.md` — Field architecture and required site inputs.
 * `BOM-ESP32S3.md` — Complete ESP32-S3 controller and camera head BOM (Seeed XIAO ESP32S3, OV2640 No IR-Cut, IP67 junction box, MAX3490 RS-422, off-axis IR spotlight, conformal coating, desiccant).
 * `OUTDOOR_INSTALLATION.md` — Year-round Utah outdoor NEMA 4X/IP66 enclosure and solar/thermal requirements.
-* `VISION_ALGORITHM.md` — Detailed $0.01\text{ ft}$ mark distortion transition algorithm, 5-stage DSP filter specification, and off-axis IR optics rule.
+* `VISION_ALGORITHM.md` — Detailed $0.01\text{ ft}$ mark distortion transition algorithm, four-stage DSP filter specification, and off-axis IR optics rule.
+* `main/vision_detector.h` / `main/vision_detector.cpp` — Fixed-crop, 0.01-ft staff-mark transition detector with geometry validation.
 * `main/vision_dsp.h` / `main/vision_dsp.cpp` — C++ DSP pipeline classes (`BurstFilter`, `StageIIRFilter`, `VisionDSPPipeline`).
-* `main/vision_poc.cpp` — ESP32 vision benchmark engine and SPIFFS BMP writer.
+* `main/vision_poc.cpp` — ESP32 vision benchmark orchestration and SPIFFS BMP writer.
 * `main/video_frames_data.h` — 169 full 1:1 scale video frame crops from `IMG_2278.MOV`.
-* `main/installation_config.h` — Site configuration, sensor ranges, and rating table coefficients.
+* `main/installation_config.h` — Site configuration and sensor ranges; certified flow calibration is still pending.
+* `tests/run_host_tests.sh` — Host behavior tests for head and flow conversion, staff-mark detection, and DSP filtering.
 * `partitions.csv` — Custom 16 MB flash partition layout (6 MB App, 4 MB SPIFFS `images`).
 
 ---

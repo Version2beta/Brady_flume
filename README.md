@@ -2,9 +2,11 @@
 
 ## Project Overview
 
-The Brady Ditch Flume Monitor is an automated, solar-powered water recorder for a Parshall flume. It uses an ESP32-S3 microcontroller and two outdoor cameras to read staff gauges without touching the water. By detecting water distortion directly on the printed gauge marks, the system filters out surface waves, calculates flow rates, and stores both CSV flow logs and visual audit photos for field verification.
+The Brady Ditch Flume Monitor is an intended solar-powered water recorder for a Parshall flume. The field design uses an ESP32-S3 controller and two outdoor cameras to read staff gauges without touching the water.
 
-## Key System Features
+> **Current firmware status — proof of concept:** the checked-in firmware builds an ESP-IDF application that runs a fixed 169-frame vision benchmark, attempts to write one annotated BMP to a pre-provisioned SPIFFS partition, emits a demo head value, and rejects flow conversion until certified calibration is supplied. Camera capture, dual-node RS-422 communication, SD/CSV logging, USB MSC, RTC, display, and LTE-M are planned field capabilities, not current firmware features.
+
+## Intended Field Capabilities
 
 * **Non-Contact Camera Reading**  
   Reads depth directly from staff gauges without sensors in the water, avoiding mud, moss, or physical damage.
@@ -24,6 +26,9 @@ The Brady Ditch Flume Monitor is an automated, solar-powered water recorder for 
 * **Plug-and-Play USB File Access**  
   Plugging a laptop into the monitor mounts its MicroSD card as a standard USB flash drive (`BRADY_FLUME/`), letting technicians drag and drop flow logs and audit photos.
 
+* **Optional LTE-M Remote Telemetry**
+  An LTE-M modem can send periodic flow, sensor-health, and battery summaries plus alarm notifications while retaining audit images and full records locally for field retrieval.
+
 ---
 
 ## Documentation Index
@@ -35,7 +40,7 @@ The Brady Ditch Flume Monitor is an automated, solar-powered water recorder for 
   Year-round Utah installation baseline (-30 °C to +60 °C), NEMA 4X solar enclosure layout, Gore hydrophobic vent, central 24V-to-12V power distribution, 3-wire Pt100 RTD radiation shield, and the 3.5-foot cross-arm mounting geometry.
 
 * [`VISION_ALGORITHM.md`](VISION_ALGORITHM.md)  
-  Technical specification for the $0.01\text{ ft}$ Submerged Mark Distortion Transition algorithm, off-axis IR lighting physics rule, 5-stage C++ DSP pipeline (`BurstFilter`, `StageIIRFilter`, `VisionDSPPipeline`), and visual audit image retention strategy.
+  Technical specification for the $0.01\text{ ft}$ Submerged Mark Distortion Transition algorithm, off-axis IR lighting physics rule, four-stage C++ DSP pipeline (`BurstFilter`, `StageIIRFilter`, `VisionDSPPipeline`), and visual audit image retention strategy.
 
 * [`HANDOFF.md`](HANDOFF.md)  
   Current system status, quick start build/flash commands, firmware module index, and hardware handoff details.
@@ -68,7 +73,7 @@ graph TD
 
 ---
 
-## Field Architecture
+## Intended Field Architecture
 
 | Function | Recommended Approach |
 | --- | --- |
@@ -90,11 +95,19 @@ graph TD
 
 ---
 
-## Build Commands
+## Validation and Build Commands
+
+Run deterministic host tests without ESP-IDF or hardware:
+
+```sh
+tests/run_host_tests.sh
+```
+
+Build and optionally flash through the board's UART USB-C port. On this development machine, the WCH bridge appears as `/dev/cu.wchusbserial310`; use the currently discovered path if it changes.
 
 ```sh
 source ~/esp/esp-idf/export.sh
 idf.py set-target esp32s3
 idf.py build
-idf.py -p /dev/cu.usbmodem3101 flash
+idf.py -p /dev/cu.wchusbserial310 flash
 ```

@@ -6,7 +6,7 @@
 namespace dsp {
 
 struct frame_reading_t {
-    float head_ft;          // Snapped discrete 0.02 ft head value
+    float head_ft;          // Snapped discrete 0.01 ft head value
     float confidence;       // Contrast / sharpness score (0.0 to 1.0)
     bool valid;             // Passed frame confidence gate
 };
@@ -18,6 +18,8 @@ public:
     BurstFilter();
 
     void reset();
+    // Records one sampled frame. Non-finite values and confidence outside the
+    // documented 0.0–1.0 range are rejected but remain in total_count().
     bool add_frame(float head_ft, float confidence, float min_confidence = 0.30f);
 
     size_t valid_count() const { return valid_count_; }

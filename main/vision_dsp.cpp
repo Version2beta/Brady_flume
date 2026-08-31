@@ -18,11 +18,13 @@ void BurstFilter::reset() {
 }
 
 bool BurstFilter::add_frame(float head_ft, float confidence, float min_confidence) {
-    if (total_count_ >= kMaxBurstFrames) {
+    if (total_count_ >= kMaxBurstFrames || !std::isfinite(min_confidence) ||
+        min_confidence < 0.0f || min_confidence > 1.0f) {
         return false;
     }
 
-    const bool is_valid = (confidence >= min_confidence);
+    const bool is_valid = std::isfinite(head_ft) && std::isfinite(confidence) &&
+                          confidence >= min_confidence && confidence <= 1.0f;
     frames_[total_count_] = {
         .head_ft = head_ft,
         .confidence = confidence,

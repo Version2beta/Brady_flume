@@ -2,11 +2,13 @@
 
 ## Executive Overview
 
-The machine vision subsystem uses **deterministic classical computer vision** and **digital signal processing (DSP)** running on the ESP32-S3. It performs non-contact stage measurement on a standard USGS Parshall-flume staff gauge without requiring AI, cloud processing, or continuous high-power video streams.
+The intended machine-vision subsystem uses **deterministic classical computer vision** and **digital signal processing (DSP)** on ESP32-S3 camera nodes. It is designed to perform non-contact stage measurement on a standard USGS Parshall-flume staff gauge without AI, cloud processing, or continuous high-power video streams.
+
+> **Implementation status:** `main/vision_poc.cpp` is a fixed-corpus proof of concept. It processes 169 embedded 120 × 200 grayscale frames with hard-coded crop geometry and thresholds, then writes `/images/clean_reference.bmp` to SPIFFS. It does not implement camera capture, field commissioning, dual-camera operation, MicroSD/JPEG retention, USB MSC, or the camera-node protocol. The sections below describe the intended field algorithm and must not be read as claims of current firmware behavior.
 
 ---
 
-## Primary Algorithm: Submerged Mark Distortion Transition
+## Target Algorithm: Submerged Mark Distortion Transition
 
 Standard edge detection and solarization in water-only ROIs fail near turbulent flumes because surface foam, glint, and algae stains create false edge boundaries.
 
@@ -18,12 +20,12 @@ The primary algorithm operates directly on the printed staff marks:
 2. **Distorted Marks (Submerged Under Water)**  
    Tick marks under moving water are optically refracted, blurred, and distorted by surface turbulence.
 
-3. **Discrete $0.02\text{ ft}$ Grid Quantization**  
-   The algorithm evaluates tick mark contrast and horizontal Sobel edge gradients along the right edge of the staff gauge ($0.04, 0.06, 0.08, 0.10, 0.12\text{ ft}$). It locates the optical transition boundary between the lowest crisp mark and highest distorted mark and snaps the reading to the nearest discrete **$0.02\text{ ft}$** ($0.24\text{ inch}$) staff mark.
+3. **Discrete $0.01\text{ ft}$ Grid Quantization**
+   The algorithm evaluates tick mark contrast and horizontal Sobel edge gradients along the right edge of the staff gauge ($0.04, 0.05, 0.06, 0.07, 0.08\text{ ft}$). It locates the optical transition boundary between the lowest crisp mark and highest distorted mark and snaps the reading to the nearest discrete **$0.01\text{ ft}$** ($0.12\text{ inch}$) staff mark.
 
 ---
 
-## 5-Stage C++ DSP Pipeline (`main/vision_dsp.h` / `main/vision_dsp.cpp`)
+## Target Four-Stage DSP Pipeline (`main/vision_dsp.h` / `main/vision_dsp.cpp`)
 
 ```
 [Camera 20-Frame Burst] 
@@ -68,18 +70,22 @@ The primary algorithm operates directly on the printed staff marks:
 
 ---
 
-## ESP32-S3 Hardware Benchmark Performance (`/dev/cu.usbmodem3101`)
+## ESP32-S3 Hardware Benchmark Observation
 
-Evaluated on 169 un-downsampled 1:1 scale video frames from field Live Photo clip `IMG_2278.MOV` (5.7s total duration):
+The current worktree was built, flashed, and run against its embedded 169-frame, 120 × 200 grayscale corpus on the documented ESP32-S3:
 
-* **Processing Throughput:** **$855.6\text{ Frames Per Second}$** ($1.169\text{ ms}$ per frame)
-* **Full Stream Execution Time:** $197.52\text{ ms}$ for 169 frames
+* **WCH UART console:** **$854.8\text{ Frames Per Second}$** ($1.170\text{ ms}$ per frame)
+* **Native USB console:** **$1555.3\text{ Frames Per Second}$** ($0.643\text{ ms}$ per frame)
 * **Level Distribution:**
-  * **$0.08\text{ ft}$ ($0.96\text{ in}$):** **62% of frames** (Primary water stage / wave crests)
-  * **$0.06\text{ ft}$ ($0.72\text{ in}$):** **32% of frames** (Wave baseline / troughs)
-  * **$0.04\text{ ft}$ ($0.48\text{ in}$):** **4% of frames** (Deep wave dips)
+  * **$0.08\text{ ft}$:** 116 frames (68%)
+  * **$0.07\text{ ft}$:** 33 frames (19%)
+  * **$0.06\text{ ft}$:** 16 frames (9%)
+  * **$0.05\text{ ft}$:** 4 frames (2%)
+  * **$0.04\text{ ft}$:** 0 frames (0%)
 * **DSP Filtered Level Convergence:** **$\mathbf{0.08\text{ ft}}$ ($0.96\text{ inches}$)**
-* **Visual Audit Output:** Stored as 24-bit RGB bitmap at `/images/clean_reference.bmp` in internal SPIFFS flash partition.
+* **Visual Audit Output:** SPIFFS reported successful storage of the 24-bit RGB bitmap at `/images/clean_reference.bmp`.
+
+Benchmark timing currently includes a progress log every ten frames, so console transport materially affects the result. These observations validate the complete fixed-corpus proof-of-concept loop, not algorithm-only throughput, live camera capture, or field measurement accuracy.
 
 ---
 

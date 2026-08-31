@@ -1,6 +1,7 @@
 #include "flow.h"
 
 #include <math.h>
+#include <stddef.h>
 
 bool flow_from_head(const parshall_calibration_t *calibration,
                     float head_ft,
