@@ -59,14 +59,18 @@ This baseline applies to the Brady Ditch Parshall-flume monitor. It establishes 
 
 ## Power, Grounding, and Surge Protection
 
-- **Solar Battery Bank:** 24V AGM or LiFePO4 battery bank charged via a 24V MPPT solar charge controller. Raw solar battery voltage fluctuates between $22.0\text{V}$ (discharged) and $29.2\text{V}$ (charging peak).
-- **Central Regulated 24V-to-12V Industrial DC-DC Converter (Selected):**  
+- **Seasonal operating period:** The monitor need not operate from November through March. Size solar collection and autonomy for April–October, including variable April and October weather; the winter shutdown must still protect the installed battery.
+- **Solar Battery Bank (Selected):** Three identical 25.6V nominal, 6Ah (153.6Wh) 8S LiFePO4 modules in parallel form a 25.6V, 18Ah, 460.8Wh nominal bank. Each module has an integrated 15A BMS, a 6A maximum charge rate, a 15A maximum continuous-discharge rating, a 29.2V full-charge voltage, and a stated 20V discharged voltage. At the preliminary conservative 75Wh/day battery budget and 80% usable depth of discharge, the bank provides approximately 4.9 days of autonomy. This is a design estimate pending field load measurement.
+- **Battery interconnect:** Use the selected Molex VersaBlade connector system: battery housing 35151-0610, mating housing 35150-0610, 14-AWG female terminal 35746-0210, and retention lock 35150-0390. Parallel only identical modules at equal state of charge if their BMS manufacturer explicitly permits parallel operation. Fuse each module positive lead independently and use equal-gauge, equal-length leads to the common bus. The full protected topology, preliminary fuse ratings, and connector-pinout constraint are specified in [POWER_SYSTEM.md](POWER_SYSTEM.md).
+- **Solar charging (Candidate):** Use a 100W nominal 24V panel and an MPPT controller compatible with the panel open-circuit voltage and 29.2V 8S LiFePO4 charge limit. The controller/BMS must inhibit charging below 0°C unless the battery is heated. No battery heater is required for the intentional November–March shutdown.
+- **Low-voltage protection:** Do not use the 20V BMS disconnect as the ordinary discharge limit. Configure a system low-voltage cutoff and recovery threshold from the battery supplier's discharge recommendation.
+- **Central Regulated 24V-to-12V Industrial DC-DC Converter (Candidate):**
   A DIN-rail mounted industrial DC-DC buck converter (**Mean Well DDR-15G-12** or **Victron Orion 24/12-10**) sits immediately downstream of the battery fuses.
   * **Input:** $18\text{V to }36\text{V DC}$ (accepts raw solar battery fluctuation).
   * **Output:** Clean, short-circuit and surge-protected **$12.0\text{V DC}$ regulated power bus**.
   * **Distribution:** Supplies clean 12V DC power to the main ESP32-S3 controller board, E-Ink display, 3-wire RTD front ends, RS-422 bus, camera head nodes over the 6-conductor cable, and gated 850nm IR spotlight.
   * **Local Node Step-Down:** Each Seeed XIAO ESP32S3 camera head node steps down the clean 12V DC rail to $3.3\text{V DC}$ locally using its onboard buck regulator.
-- **Circuit Protection:** Fused branches on all 24V and 12V lines, reverse-polarity diode protection, and thermal shutdown.
+- **Circuit Protection:** Individually fused battery-module branches, fused 24V and 12V distribution branches, reverse-polarity protection, and thermal shutdown.
 - **Surge & Lightning Protection:** Listed DIN-rail surge protectors on incoming solar and RS-422 field cables bonded to a copper grounding rod.
 - **Cable Shielding:** 6-conductor (3 twisted-pair) 22 AWG outdoor shielded cable carries full-duplex RS-422 data pairs and clean 12V power to the cross-arm assembly, grounded at the main enclosure end to prevent ground loops.
 

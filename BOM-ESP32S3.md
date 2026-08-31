@@ -1,8 +1,8 @@
 # Brady Ditch monitor — ESP32-S3 bill of materials
 
-This BOM covers the intended ESP32-S3 controller and camera vision system. It meets the [outdoor installation baseline](OUTDOOR_INSTALLATION.md); it is not a statement of current firmware capability.
+This BOM covers the intended ESP32-S3 controller and camera vision system. It meets the [outdoor installation baseline](OUTDOOR_INSTALLATION.md); the protected battery-bank topology and assembly constraints are in [POWER_SYSTEM.md](POWER_SYSTEM.md). It is not a statement of current firmware capability.
 
-Status labels: **selected** = agreed design choice; **candidate** = appropriate class/part pending review; **TBD** = required information is missing.
+Status labels: **selected** = agreed design choice; **candidate** = appropriate class/part pending review; **observed** = recovered listing or development-environment information; **TBD** = required information is missing.
 
 | Function | Item / specification | Manufacturer / candidate | Status | Notes |
 | --- | --- | --- | --- | --- |
@@ -27,8 +27,14 @@ Status labels: **selected** = agreed design choice; **candidate** = appropriate 
 | Enclosure | NEMA 4X / IP66 minimum outdoor enclosure, UV-resistant window, vent, and condensation management | Fibox / Hammond NEMA 4X fiberglass | selected | Follows shared outdoor baseline. Light-colored enclosure with top shade shield. |
 | Hydrophobic Vent Gland | Gore Hydrophobic Breathable Vent Gland | Gore M12 Hydrophobic Vent | selected | Equalizes pressure inside main solar enclosure during temperature swings while blocking liquid water, snow, and dust ingress. |
 | Radiation Shield | 6-Plate Ventilated Solar Radiation Shield | Standard 6-Plate Louvered Shield | selected | Houses the 3-inch 316 SS air RTD sheath below the main enclosure to prevent direct solar radiation from skewing air temperature logs. |
-| Central DC-DC Buck Converter | Regulated Industrial 24V-to-12V DC-DC Buck Converter ($18\text{--}36\text{V In} \rightarrow 12.0\text{V Regulated Out}$) | Mean Well DDR-15G-12 / Victron Orion 24/12-10 | selected | Sits downstream of battery fuses. Converts noisy 24V battery voltage ($22.0\text{V--}29.2\text{V}$) into clean, short-circuit protected 12.0V DC to power main ESP32, 3-wire RTDs, RS-422 bus, camera head nodes, and IR spotlight. |
-| Power | 24 V AGM/LiFePO4 battery, properly sized MPPT solar charge controller, fused/surge-protected DC-DC converter | Morningstar / Victron MPPT + 24V Battery | selected | Follows shared outdoor baseline. Powers main controller, 3-wire RTDs, RS-422 bus, and gated 2-second IR illuminator bursts. |
+| Central DC-DC Buck Converter | Regulated industrial 24V-to-12V DC-DC buck converter ($18\text{--}36\text{V In} \rightarrow 12.0\text{V Regulated Out}$) | Mean Well DDR-15G-12 / Victron Orion 24/12-10 | candidate | Must support the measured 12V peak load, including both camera heads and the IR burst; do not select the 15W DDR-15G-12 unless that load is shown to remain within its output rating. |
+| Battery module (Qty 3, parallel) | 25.6V nominal, 6Ah, 153.6Wh LiFePO4 pack; 8S (8 × 3.2V / 6Ah 32650 cells); integrated 15A BMS; 6A max charge; 15A max continuous discharge; 29.2V full, 20V discharged | BatteryHookup listing: “25.6v 6ah 153.6wh Lifepo4 Battery with BMS (24v)” | selected | Three identical modules in parallel form a 25.6V, 18Ah, 460.8Wh nominal bank. The original listing did not provide a recoverable battery manufacturer part number. Verify the BMS manufacturer permits parallel operation before procurement. |
+| Battery service connector — pack housing | 6-circuit Molex VersaBlade housing | Molex 35151-0610 | selected | Battery-side connector housing. |
+| Battery service connector — mating housing | 6-circuit Molex VersaBlade housing | Molex 35150-0610 | selected | Mates with the battery-side housing. |
+| Battery service connector — female terminal | 14 AWG female VersaBlade terminal | Molex 35746-0210 | selected | Use with the specified connector housing and wire gauge. |
+| Battery service connector — retention lock | VersaBlade terminal retention lock | Molex 35150-0390 | selected | Install per Molex connector-system requirements. |
+| Solar charging | 100W nominal 24V solar panel with MPPT charge controller | Panel and controller TBD | candidate | Sized for April–October operation and recovery after cloudy shoulder-season days. Controller must support the panel open-circuit voltage, the 8S LiFePO4 29.2V charge limit, and a BMS-controlled no-charge condition below 0°C. |
+| Power distribution | Individually fused parallel battery branches, fused/surge-protected DC-DC converter, and 12V branch protection | Fuses, bus bars, and low-voltage cutoff TBD | candidate | Use equal-gauge, equal-length module leads to a common bus. Do not rely on the 20V BMS disconnect for normal operation; set a system low-voltage cutoff using the battery supplier's discharge recommendation. |
 
 ## ESP32-S3 rugged implementation
 

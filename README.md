@@ -39,6 +39,9 @@ The Brady Ditch Flume Monitor is an intended solar-powered water recorder for a 
 * [`OUTDOOR_INSTALLATION.md`](OUTDOOR_INSTALLATION.md)  
   Year-round Utah installation baseline (-30 °C to +60 °C), NEMA 4X solar enclosure layout, Gore hydrophobic vent, central 24V-to-12V power distribution, 3-wire Pt100 RTD radiation shield, and the 3.5-foot cross-arm mounting geometry.
 
+* [`POWER_SYSTEM.md`](POWER_SYSTEM.md)
+  Preliminary April–October solar/battery-bank topology, protected parallel-pack interconnect, Molex VersaBlade harness components, and outstanding power-system validation.
+
 * [`VISION_ALGORITHM.md`](VISION_ALGORITHM.md)  
   Technical specification for the $0.01\text{ ft}$ Submerged Mark Distortion Transition algorithm, off-axis IR lighting physics rule, and the five-stage vision/DSP pipeline: quantized mark-distortion, confidence gate, burst filter, EMA, and rate clamp.
 
@@ -56,7 +59,7 @@ The Brady Ditch Flume Monitor is an intended solar-powered water recorder for a 
 graph TD
     subgraph Main_Solar_Enclosure [Main Solar Enclosure - NEMA 4X]
         Main_ESP32[ESP32-S3 Main Controller Node]
-        Battery[24V AGM/LiFePO4 Solar Battery]
+        Battery[3 × 25.6V 6Ah LiFePO4 Packs in Parallel]
         Solar_MPPT[MPPT Solar Charge Controller]
         EPaper[4.2-inch E-Ink Status Display]
         Gore_Vent[Gore Hydrophobic Vent Gland]
@@ -86,7 +89,7 @@ graph TD
 | Historic Data | Planned timestamped CSV records and 15-min annotated JPEG audit photos; see [data and audit records](DATA_AND_AUDIT_RECORDS.md). |
 | Field Retrieval | Planned USB Mass Storage (MSC) access to the MicroSD filesystem as `BRADY_FLUME/`; see [data and audit records](DATA_AND_AUDIT_RECORDS.md). |
 | Status Display | 4.2" low-power E-Ink display showing head, flow, daily/annual volume, temperature, battery, and sensor health. |
-| Solar Power | 24V AGM/LiFePO4 battery through a Mean Well 24V-to-12V industrial buck converter and MPPT solar charge controller. |
+| Solar Power | Three 25.6V, 6Ah LiFePO4 modules in parallel (25.6V, 18Ah, 460.8Wh nominal), charged by a candidate 100W 24V panel and MPPT controller; see the BOM, installation baseline, and [power-system specification](POWER_SYSTEM.md) for module, connector, low-temperature, parallel-BMS, and protection constraints. |
 
 ---
 
@@ -94,7 +97,7 @@ graph TD
 
 1. Parshall flume throat width, upstream staff-gauge datum, and the governing rating table/equation.
 2. Certified rating table coefficients for $Q = C \cdot H^n$ in `main/installation_config.h`.
-3. Battery capacity, solar panel wattage, and winter shading assumptions.
+3. April–October solar-window and shading assessment, confirmation that the chosen BMS permits parallel operation, and measured field load (especially IR, camera, and converter-idle consumption).
 
 ---
 
