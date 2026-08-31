@@ -17,24 +17,33 @@ namespace {
 
 constexpr const char *TAG = "vision_poc";
 
+// USGS / OpenChannelFlow Staff Gauge Hundredths-of-a-Foot (0.01 ft) Structure:
+// - Longest Bar (Downturned Point): 0.10 ft Major Mark
+// - Mid-Length Bar (Upturned Point): 0.05 ft Half-Tenth Landmark
+// - Shortest Black Bars: 0.01 ft thick
+// - White Spaces: 0.01 ft thick
+
 struct staff_mark_reading_t {
-    float head_ft;          // Snapped discrete 0.02 ft head value
+    float head_ft;          // Snapped discrete 0.01 ft (hundredths) head value
     int transition_row;     // Image row of the distortion boundary
     float contrast_ratio;   // Crispness / confidence score
 };
 
-// Evaluate un-downsampled 1:1 full resolution tick mark ROI (120 x 200 crop)
+// Refined 0.01 ft Sub-Bar Edge & White Space Transition Detector
 staff_mark_reading_t process_single_frame(const uint8_t *frame_crop, int width, int height) {
-    // Right tick mark ROI (x = 40 to 100 in the 120-pixel wide crop)
     const int right_x1 = 40;
     const int right_x2 = 100;
 
-    // 1:1 full resolution y-rows in 200-pixel height crop (y_full = 1500 + y_crop):
-    // 0.08 ft (y_full = 1560) => y_crop = 60
-    // 0.06 ft (y_full = 1610) => y_crop = 110
-    // 0.04 ft (y_full = 1660) => y_crop = 160
+    // 1:1 full resolution y-rows for 0.01 ft hundredths increments:
+    // y_crop = 60  => 0.08 ft (4th Black Bar Center)
+    // y_crop = 85  => 0.07 ft (White Space / Bottom of 4th Bar)
+    // y_crop = 110 => 0.06 ft (3rd Black Bar Center)
+    // y_crop = 135 => 0.05 ft (Mid-Length Upturned Point Landmark)
+    // y_crop = 160 => 0.04 ft (2nd Black Bar Center)
     const int y_08 = 60;
+    const int y_07 = 85;
     const int y_06 = 110;
+    const int y_05 = 135;
     const int y_04 = 160;
 
     auto eval_stripe = [&](int y_center, float &out_c, float &out_sx) {
@@ -43,7 +52,7 @@ staff_mark_reading_t process_single_frame(const uint8_t *frame_crop, int width, 
         float sum_sobel = 0.0f;
         int count = 0;
 
-        for (int y = y_center - 3; y <= y_center + 3; ++y) {
+        for (int y = y_center - 2; y <= y_center + 2; ++y) {
             for (int x = right_x1; x <= right_x2; ++x) {
                 uint8_t p = frame_crop[y * width + x];
                 if (p < min_v) min_v = p;
@@ -60,26 +69,38 @@ staff_mark_reading_t process_single_frame(const uint8_t *frame_crop, int width, 
     };
 
     float c_08 = 0.0f, sx_08 = 0.0f;
+    float c_07 = 0.0f, sx_07 = 0.0f;
     float c_06 = 0.0f, sx_06 = 0.0f;
+    float c_05 = 0.0f, sx_05 = 0.0f;
     float c_04 = 0.0f, sx_04 = 0.0f;
 
     eval_stripe(y_08, c_08, sx_08);
+    eval_stripe(y_07, c_07, sx_07);
     eval_stripe(y_06, c_06, sx_06);
+    eval_stripe(y_05, c_05, sx_05);
     eval_stripe(y_04, c_04, sx_04);
 
     float detected_head = 0.08f;
     int transition_y = y_08;
     float confidence = c_08 / 150.0f;
 
-    // Full-resolution contrast threshold: crisp tick has contrast >= 110
+    // Evaluate top-down to find the optical transition at 0.01 ft hundredths resolution
     if (c_08 < 110.0f) {
         detected_head = 0.08f;
         transition_y = y_08;
         confidence = c_08 / 150.0f;
+    } else if (c_07 < 100.0f) {
+        detected_head = 0.07f;
+        transition_y = y_07;
+        confidence = c_07 / 150.0f;
     } else if (c_06 < 110.0f) {
         detected_head = 0.06f;
         transition_y = y_06;
         confidence = c_06 / 150.0f;
+    } else if (c_05 < 100.0f) {
+        detected_head = 0.05f;
+        transition_y = y_05;
+        confidence = c_05 / 150.0f;
     } else {
         detected_head = 0.04f;
         transition_y = y_04;
@@ -138,7 +159,7 @@ void write_annotated_bmp(const uint8_t *image, int width, int height, int red_ro
 
 void vision_poc_run(void) {
     ESP_LOGI(TAG, "==================================================================");
-    ESP_LOGI(TAG, "ESP32-S3 FULL-RESOLUTION %d-FRAME VIDEO STREAM PROCESSING BENCHMARK", kNumVideoFrames);
+    ESP_LOGI(TAG, "ESP32-S3 REFINED 0.01 FT HUNDREDTHS RESOLUTION 169-FRAME BENCHMARK");
     ESP_LOGI(TAG, "==================================================================");
 
     dsp::VisionDSPPipeline dsp_pipeline(0.25f, 0.10f);
@@ -147,14 +168,16 @@ void vision_poc_run(void) {
     const int64_t start_time = esp_timer_get_time();
 
     int last_red_row = 0;
-    int count_08 = 0, count_06 = 0, count_04 = 0;
+    int count_08 = 0, count_07 = 0, count_06 = 0, count_05 = 0, count_04 = 0;
 
     for (int frame_idx = 0; frame_idx < kNumVideoFrames; ++frame_idx) {
         const uint8_t *crop = kVideoFrames[frame_idx];
         const staff_mark_reading_t reading = process_single_frame(crop, kVideoFrameWidth, kVideoFrameHeight);
 
         if (reading.head_ft >= 0.079f) count_08++;
+        else if (reading.head_ft >= 0.069f) count_07++;
         else if (reading.head_ft >= 0.059f) count_06++;
+        else if (reading.head_ft >= 0.049f) count_05++;
         else count_04++;
 
         dsp_pipeline.add_frame_sample(reading.head_ft, reading.contrast_ratio);
@@ -176,10 +199,12 @@ void vision_poc_run(void) {
     const double fps = (static_cast<double>(kNumVideoFrames) / total_ms) * 1000.0;
 
     ESP_LOGI(TAG, "==================================================================");
-    ESP_LOGI(TAG, "FULL-RESOLUTION %d-FRAME BENCHMARK COMPLETE", kNumVideoFrames);
-    ESP_LOGI(TAG, "Highest Distorted Mark Distribution (Full 1:1 Resolution):");
+    ESP_LOGI(TAG, "REFINED 0.01 FT HUNDREDTHS %d-FRAME BENCHMARK COMPLETE", kNumVideoFrames);
+    ESP_LOGI(TAG, "0.01 ft Hundredths Reading Distribution:");
     ESP_LOGI(TAG, "  0.08 ft (0.96 in): %3d frames (%d%%)", count_08, (count_08 * 100) / kNumVideoFrames);
+    ESP_LOGI(TAG, "  0.07 ft (0.84 in): %3d frames (%d%%)", count_07, (count_07 * 100) / kNumVideoFrames);
     ESP_LOGI(TAG, "  0.06 ft (0.72 in): %3d frames (%d%%)", count_06, (count_06 * 100) / kNumVideoFrames);
+    ESP_LOGI(TAG, "  0.05 ft (0.60 in): %3d frames (%d%%)", count_05, (count_05 * 100) / kNumVideoFrames);
     ESP_LOGI(TAG, "  0.04 ft (0.48 in): %3d frames (%d%%)", count_04, (count_04 * 100) / kNumVideoFrames);
     ESP_LOGI(TAG, "------------------------------------------------------------------");
     ESP_LOGI(TAG, "Total Processing Time: %.2f ms across %d video frames", total_ms, kNumVideoFrames);
