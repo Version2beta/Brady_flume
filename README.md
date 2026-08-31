@@ -14,6 +14,30 @@ This first buildable milestone establishes the ESP32-S3 firmware and a tested fl
 - The rating coefficients are deliberately disabled until the flume geometry and calibration are known.
 - NVS is initialized, but no readings are yet stored. Do not use this firmware for operational accounting.
 
+## System Architecture Diagram
+
+```mermaid
+graph TD
+    subgraph Main_Solar_Enclosure [Main Solar Enclosure - NEMA 4X]
+        Main_ESP32[ESP32-S3 Main Controller Node]
+        Battery[24V AGM/LiFePO4 Solar Battery]
+        Solar_MPPT[MPPT Solar Charge Controller]
+        EPaper[4.2" E-Ink Status Display]
+        Gore_Vent[Gore Hydrophobic Vent Gland]
+        RTDs[3-Wire Pt100 Air & Water RTDs]
+    end
+
+    subgraph Cross_Arm_Assembly [3.5-Foot Rigid Cross-Arm Assembly - IP67]
+        Ha_Cam[Ha Camera Box: Seeed XIAO ESP32S3 + OV2640 + MAX3490]
+        Center_IR[Center IR Spotlight: Shared 850nm 60° Flood]
+        Hb_Cam[Hb Camera Box: Seeed XIAO ESP32S3 + OV2640 + MAX3490]
+    end
+
+    Main_ESP32 <==>|4-Wire Shielded RS-422 Cable| Ha_Cam
+    Main_ESP32 <==>|4-Wire Shielded RS-422 Cable| Hb_Cam
+    Main_ESP32 --->|Gated 12V MOSFET Power| Center_IR
+```
+
 ## Field architecture
 
 | Function | Recommended approach |
