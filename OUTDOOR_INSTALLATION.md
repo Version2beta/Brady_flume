@@ -13,6 +13,8 @@ This baseline applies to the Brady Ditch Parshall-flume monitor. It establishes 
 - **Display Window:** UV-stable impact-resistant viewing window for the 4.2" E-Ink display.
 
 ### 2. Camera Head Nodes ($H_a$ Primary & $H_b$ Submergence Gauges)
+- **Unified Cross-Arm Mounting Bar:** Both camera junction boxes ($H_a$ and $H_b$) and the single IR spotlight are mounted on a **single 3.5-foot rigid cross-arm support bar** positioned **3.5 feet ($42\text{ inches}$) out from the flume sidewall**.
+- **Lens Specification:** Each camera uses an **$8.0\text{ mm}$ M12 glass lens** (or $12.0\text{ mm}$ telephoto). At $3.5\text{ feet}$ distance, the 1-foot staff gauge fills $70\%$ of the vertical image frame, yielding **14.0 vertical pixels per $0.01\text{ ft}$** ($0.12\text{ in}$ hundredths resolution).
 - **Enclosures:** Compact IP67 polycarbonate enclosures ($50 \times 50 \times 35\text{ mm}$) with clear front viewing lids and silicone perimeter gaskets.
 - **Internal PCB Protection:** All internal circuit boards (Seeed XIAO ESP32S3 and MAX3490 RS-422 transceiver) are coated with **MG Chemicals 422B Silicone Conformal Coating** to prevent shorts or corrosion from ambient humidity.
 - **Anti-Fog Window Protection:** Mini 1-gram silica gel desiccant packets sealed inside each camera junction box prevent internal moisture from fogging the clear front lid during freezing Utah winter snaps.
@@ -20,8 +22,8 @@ This baseline applies to the Brady Ditch Parshall-flume monitor. It establishes 
 
 ### 3. Shared Night Optics & Off-Axis IR Spotlight
 - **CRITICAL OPTICAL REQUIREMENT:** Because staff gauge face paint is intentionally retroreflective, mounting an IR light source on the exact same axis as the camera lens causes a blinding white glare reflection that completely obliterates the black tick marks.
-- **Single Shared Spotlight:** Because the $H_a$ primary staff gauge and $H_b$ submergence staff gauge are only 1 to 3 feet apart on the flume wall, a **single standalone IP67 850nm IR Spotlight** with a $60^\circ$ flood beam spread illuminates **both staff gauges simultaneously**.
-- **Off-Axis Mounting Position:** The spotlight is mounted **2 to 3 feet horizontally off-axis (to the side of the flume)** relative to the cameras, aimed at a $15^\circ\text{ to }30^\circ$ angle toward the flume sidewall.
+- **Single Shared Spotlight:** A single standalone IP67 850nm IR Spotlight with a $60^\circ$ flood beam spread mounted at the far end of the 3.5-foot cross-arm bar ($2.5\text{ ft}$ horizontal offset from $H_a$ camera) illuminates **both $H_a$ and $H_b$ staff gauges simultaneously**.
+- **Off-Axis Angle:** At $3.5\text{ ft}$ distance out from the wall, the $2.5\text{ ft}$ offset creates an optimal **$30^\circ$ lighting angle** across the flume wall, eliminating retroreflective white-out glare while producing high contrast on the graduation marks.
 - **Gated Power Control:** The shared IR spotlight is switched via a MOSFET/relay output on the main controller, energized for only 2 seconds per 15-minute nighttime logging burst to conserve solar battery capacity.
 
 ### 4. Temperature Sensors & Radiation Shield
