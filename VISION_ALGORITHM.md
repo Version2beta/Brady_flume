@@ -83,6 +83,25 @@ Evaluated on 169 un-downsampled 1:1 scale video frames from field Live Photo cli
 
 ---
 
+## Visual Audit Image Retention Strategy
+
+1. **Representative Median Frame Selection (1 Photo / Burst):**  
+   Rather than storing every frame in a 20-frame camera burst, the ESP32 selects **the single representative median frame** (the frame whose calculated level matches $H_{\text{median}}$). It annotates the frame with a red waterline at the $0.01\text{ ft}$ transition mark and saves it with a timestamped filename:
+   `/images/audit_YYYYMMDD_HHMMSS_0.08ft.jpg` (~15 KB JPEG).
+
+2. **Primary Storage — MicroSD Card ($32\text{ GB}$):**  
+   * **Daily Rate:** 96 bursts/day (15-min interval) $\approx 1.44\text{ MB / day}$.
+   * **7-Month Irrigation Season (April–October):** $\approx 300\text{ MB}$ total.
+   * **Capacity:** A $32\text{ GB}$ MicroSD card holds over **100 years of visual audit photos**.
+
+3. **Fallback Storage — 4 MB Internal SPIFFS Flash Partition:**  
+   If no MicroSD card is present, internal flash operates as a FIFO ring buffer retaining the last **250 audit photos (~2.5 days)** for USB service retrieval.
+
+4. **Field Audit Retrieval:**  
+   Field technicians connect a laptop over USB-C (`/dev/cu.usbmodem3101`) to pull audit images for visual verification against manual logs.
+
+---
+
 ## Physical Optics & Nighttime Lighting Rule
 
 **CRITICAL OPTICAL REQUIREMENT:**  

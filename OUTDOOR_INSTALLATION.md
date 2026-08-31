@@ -72,9 +72,20 @@ This baseline applies to the Brady Ditch Parshall-flume monitor. It establishes 
 
 ---
 
+## Measurement and Audit Records
+
+- **Visual Audit Image Retention:** For every 15-minute logging burst, the ESP32 selects the single representative median frame, annotates it with a red waterline at the $0.01\text{ ft}$ mark, and saves it as a 15 KB JPEG (`/images/audit_YYYYMMDD_HHMMSS_0.08ft.jpg`).
+- **Primary SD Card Storage ($32\text{ GB}$):** Retains over 100 years of visual audit photos (300 MB per 7-month irrigation season).
+- **Internal Flash Fallback (4 MB SPIFFS):** FIFO ring buffer retaining the last 250 audit photos (~2.5 days) if no SD card is present.
+- **USB Service Retrieval:** Technicians connect a laptop to USB-C (`/dev/cu.usbmodem3101`) to pull audit images for visual verification against manual logs.
+- **Temperature Sensors:** Air temperature Pt100 RTD in a 6-plate solar radiation shield; water temperature Pt100 RTD in flume sidewall.
+- **Time Synchronization & Flow Accounting:** RTC timekeeping with nonvolatile total recovery. Flow accounting remains disabled until certified Parshall rating coefficients are entered.
+
+---
+
 ## Pre-Deployment Weatherproofing Verification Checklist
 
 1. Verify conformal coating coverage on all camera node PCBs.
-2. Confirm fresh silica desiccant packs are installed inside main enclosure and camera cylinders.
-3. Check O-ring seals, PG7 cable gland compression, and external drip loops on all cables.
+2. Confirm fresh silica desiccant packs are installed inside main enclosure and camera junction boxes.
+3. Check silicone gasket seals, PG7 cable gland compression, and external drip loops on all cables.
 4. Perform an enclosure thermal/condensation trial in a cold chamber before field deployment.
