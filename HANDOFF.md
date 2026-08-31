@@ -6,8 +6,8 @@
 - **Build & Flash:** ESP-IDF v6.0.2 project builds cleanly and flashes successfully. Partition table allocates 6 MB factory app and 4 MB SPIFFS filesystem.
 - **Vision Subsystem:** Fully implemented and running on the ESP32-S3. Uses the **Submerged Mark Distortion Transition Algorithm** (refined to $0.01\text{ ft}$ hundredths-of-a-foot resolution per OpenChannelFlow standards) and **5-Stage C++ DSP Pipeline** (`main/vision_dsp.h`, `main/vision_dsp.cpp`, `main/vision_poc.cpp`).
 - **Benchmark Performance:** Evaluated live on 169 un-downsampled 1:1 scale field video frames from `IMG_2278.MOV` at **855.6 FPS** (1.169 ms/frame). The DSP burst median converges to **$0.08\text{ ft}$ ($0.96\text{ in}$)** (68% mode frequency).
-- **Multi-Node Architecture:** $H_a$ primary and $H_b$ submergence camera head nodes use Seeed Studio XIAO ESP32S3 Sense boards inside IP67 anodized aluminum camera tubes with MAX3490 RS-422 transceivers, communicating over a 4-wire shielded cable to the main solar enclosure.
-- **Night Optics & Lighting:** Requires a standalone off-axis IP67 850nm IR spotlight mounted 2–3 feet to the side of the camera housing to prevent sensor-blinding glare on retroreflective staff paint.
+- **Multi-Node Architecture:** $H_a$ primary and $H_b$ submergence camera head nodes use Seeed Studio XIAO ESP32S3 Sense boards inside compact IP67 clear-lid polycarbonate junction boxes ($50 \times 50 \times 35\text{ mm}$) with MAX3490 RS-422 transceivers, communicating over a 4-wire shielded cable to the main solar enclosure.
+- **Night Optics & Lighting:** A single shared off-axis IP67 850nm IR spotlight mounted 2–3 feet to the side of the flume illuminates both $H_a$ and $H_b$ staff gauges simultaneously without causing sensor-blinding glare.
 - **Visual Audit Storage:** The ESP32 mounts SPIFFS and stores 24-bit RGB annotated audit bitmaps at `/images/clean_reference.bmp`.
 - **Flow Engine:** `main/flow.c` provides $Q = C \cdot H^n$ conversion and cfs-to-acre-foot integration. Flow conversion is held until certified Parshall rating coefficients are set in `main/installation_config.h`.
 
