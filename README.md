@@ -40,7 +40,7 @@ The Brady Ditch Flume Monitor is an intended solar-powered water recorder for a 
   Year-round Utah installation baseline (-30 °C to +60 °C), NEMA 4X solar enclosure layout, Gore hydrophobic vent, central 24V-to-12V power distribution, 3-wire Pt100 RTD radiation shield, and the 3.5-foot cross-arm mounting geometry.
 
 * [`VISION_ALGORITHM.md`](VISION_ALGORITHM.md)  
-  Technical specification for the $0.01\text{ ft}$ Submerged Mark Distortion Transition algorithm, off-axis IR lighting physics rule, and five-stage vision/DSP pipeline (`vision_detector`, `BurstFilter`, `StageIIRFilter`, `VisionDSPPipeline`).
+  Technical specification for the $0.01\text{ ft}$ Submerged Mark Distortion Transition algorithm, off-axis IR lighting physics rule, and five stages: quantized mark-distortion, confidence gate, burst filter, EMA, and rate clamp.
 
 * [`DATA_AND_AUDIT_RECORDS.md`](DATA_AND_AUDIT_RECORDS.md)
   Planned CSV records, audit-image selection and retention, storage tiers, and USB retrieval; clearly separated from current proof-of-concept behavior.
