@@ -14,17 +14,21 @@ This baseline applies to the Brady Ditch Parshall-flume monitor. It establishes 
 
 ### 2. Camera Head Nodes ($H_a$ Primary & $H_b$ Submergence Gauges)
 - **Unified Cross-Arm Mounting Bar:** Both camera junction boxes ($H_a$ and $H_b$) and the single IR spotlight are mounted on a **single 3.5-foot rigid cross-arm support bar** positioned **3.5 feet ($42\text{ inches}$) out from the flume sidewall**.
+- **Flume Layout Geometry:**  
+  * **$H_a$ Upstream Camera Box:** Mounted at the **left/upstream end** of the cross-arm bar, directly opposite the $H_a$ primary staff gauge.
+  * **$H_b$ Downstream Camera Box:** Mounted at the **right/downstream end** of the cross-arm bar, directly opposite the $H_b$ throat submergence staff gauge.
+  * **Center Shared IR Spotlight:** Mounted in the **CENTER of the cross-arm bar** (directly opposite the flume throat, between the two cameras).
 - **Lens Specification:** Each camera uses an **$8.0\text{ mm}$ M12 glass lens** (or $12.0\text{ mm}$ telephoto). At $3.5\text{ feet}$ distance, the 1-foot staff gauge fills $70\%$ of the vertical image frame, yielding **14.0 vertical pixels per $0.01\text{ ft}$** ($0.12\text{ in}$ hundredths resolution).
 - **Enclosures:** Compact IP67 polycarbonate enclosures ($50 \times 50 \times 35\text{ mm}$) with clear front viewing lids and silicone perimeter gaskets.
 - **Internal PCB Protection:** All internal circuit boards (Seeed XIAO ESP32S3 and MAX3490 RS-422 transceiver) are coated with **MG Chemicals 422B Silicone Conformal Coating** to prevent shorts or corrosion from ambient humidity.
 - **Anti-Fog Window Protection:** Mini 1-gram silica gel desiccant packets sealed inside each camera junction box prevent internal moisture from fogging the clear front lid during freezing Utah winter snaps.
 - **Liquid-Tight Cable Entry:** IP68 PG7 compression cable glands seal the 4-wire shielded cable (12V Power + RS-422 pair) exiting the bottom wall of the camera box. External drip loops ensure rainwater falls away from the gland.
 
-### 3. Shared Night Optics & Off-Axis IR Spotlight
+### 3. Center Shared Night Optics & Off-Axis IR Spotlight
 - **CRITICAL OPTICAL REQUIREMENT:** Because staff gauge face paint is intentionally retroreflective, mounting an IR light source on the exact same axis as the camera lens causes a blinding white glare reflection that completely obliterates the black tick marks.
-- **Single Shared Spotlight:** A single standalone IP67 850nm IR Spotlight with a $60^\circ$ flood beam spread mounted at the far end of the 3.5-foot cross-arm bar ($2.5\text{ ft}$ horizontal offset from $H_a$ camera) illuminates **both $H_a$ and $H_b$ staff gauges simultaneously**.
-- **Off-Axis Angle:** At $3.5\text{ ft}$ distance out from the wall, the $2.5\text{ ft}$ offset creates an optimal **$30^\circ$ lighting angle** across the flume wall, eliminating retroreflective white-out glare while producing high contrast on the graduation marks.
-- **Gated Power Control:** The shared IR spotlight is switched via a MOSFET/relay output on the main controller, energized for only 2 seconds per 15-minute nighttime logging burst to conserve solar battery capacity.
+- **Center-Mounted Shared Spotlight:** Mounting the single IP67 850nm IR Spotlight in the **CENTER of the cross-arm bar** places it 1.5 to 2.0 feet off-axis from **both** the upstream $H_a$ camera and downstream $H_b$ camera simultaneously.
+- **Symmetrical Off-Axis Illumination:** The $60^\circ$ flood beam shines outwards from the center, casting $25^\circ\text{ to }30^\circ$ off-axis light onto both the $H_a$ and $H_b$ staff gauge faces, providing maximum black mark contrast without causing retroreflective glare in either camera lens.
+- **Gated Power Control:** The shared center IR spotlight is switched via a MOSFET/relay output on the main controller, energized for only 2 seconds per 15-minute nighttime logging burst to conserve solar battery capacity.
 
 ### 4. Temperature Sensors & Radiation Shield
 - **Air Temperature RTD:** Evolution Sensors P3A-S316-250-PX-3-PFXX-40-STWL 3-wire Class A Pt100 probe. The 3-inch 316 SS sheath is mounted in a stainless compression fitting below the enclosure, with the sensing tip housed inside a **6-plate ventilated solar radiation shield** to prevent direct sunlight from skewing air temperature readings.
