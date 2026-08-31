@@ -40,7 +40,7 @@ The Brady Ditch Flume Monitor is an intended solar-powered water recorder for a 
   Year-round Utah installation baseline (-30 °C to +60 °C), NEMA 4X solar enclosure layout, Gore hydrophobic vent, central 24V-to-12V power distribution, 3-wire Pt100 RTD radiation shield, and the 3.5-foot cross-arm mounting geometry.
 
 * [`VISION_ALGORITHM.md`](VISION_ALGORITHM.md)  
-  Technical specification for the $0.01\text{ ft}$ Submerged Mark Distortion Transition algorithm, off-axis IR lighting physics rule, and four-stage C++ DSP pipeline (`BurstFilter`, `StageIIRFilter`, `VisionDSPPipeline`).
+  Technical specification for the $0.01\text{ ft}$ Submerged Mark Distortion Transition algorithm, off-axis IR lighting physics rule, and five-stage vision/DSP pipeline (`vision_detector`, `BurstFilter`, `StageIIRFilter`, `VisionDSPPipeline`).
 
 * [`DATA_AND_AUDIT_RECORDS.md`](DATA_AND_AUDIT_RECORDS.md)
   Planned CSV records, audit-image selection and retention, storage tiers, and USB retrieval; clearly separated from current proof-of-concept behavior.
@@ -69,8 +69,8 @@ graph TD
         Hb_Cam[Hb Camera Box: Seeed XIAO ESP32S3 + OV2640 + MAX3490]
     end
 
-    Main_ESP32 <==>|6-Conductor Cable: RS-422 and 12V Power| Ha_Cam
-    Main_ESP32 <==>|6-Conductor Cable: RS-422 and 12V Power| Hb_Cam
+    Main_ESP32 <==>|6-Conductor RS-422 and 12V Cable| Ha_Cam
+    Main_ESP32 <==>|6-Conductor RS-422 and 12V Cable| Hb_Cam
     Main_ESP32 --->|Gated 12V MOSFET Power| Center_IR
 ```
 

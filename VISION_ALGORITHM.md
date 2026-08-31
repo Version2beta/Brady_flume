@@ -25,48 +25,58 @@ The primary algorithm operates directly on the printed staff marks:
 
 ---
 
-## Target Four-Stage DSP Pipeline (`main/vision_dsp.h` / `main/vision_dsp.cpp`)
+## Target Five-Stage Vision/DSP Pipeline (`main/vision_detector.cpp`, `main/vision_dsp.cpp`)
 
 ```
-[Camera 20-Frame Burst] 
+[Camera Frame]
        │
        ▼
 ┌──────────────────────────────────────────────────────────┐
-│ STAGE 1: Frame Confidence Gate (Outlier Rejection)       │
+│ STAGE 1: Quantized Mark-Distortion Filter                │
+│ Detects the refraction transition; snaps to 0.01 ft      │
+└──────────────────────────┬───────────────────────────────┘
+                           │ Frame Head Reading
+                           ▼
+┌──────────────────────────────────────────────────────────┐
+│ STAGE 2: Frame Confidence Gate (Outlier Rejection)       │
 │ Rejects frames with sun glint, splash, or bug occlusion  │
 └──────────────────────────┬───────────────────────────────┘
                            │ Valid Frames
                            ▼
 ┌──────────────────────────────────────────────────────────┐
-│ STAGE 2: Burst Order-Statistic Filter (α-Trimmed Mean)   │
+│ STAGE 3: Burst Order-Statistic Filter (α-Trimmed Mean)   │
 │ Sorts N frames; trims top/bottom 20% wave crests/troughs │
 └──────────────────────────┬───────────────────────────────┘
-                           │ 1-Second Burst Result
+                           │ Burst Result
                            ▼
 ┌──────────────────────────────────────────────────────────┐
-│ STAGE 3: IIR Exponential Moving Average                  │
+│ STAGE 4: IIR Exponential Moving Average                  │
 │ Smooths minute-to-minute hydrological flow transitions   │
 └──────────────────────────┬───────────────────────────────┘
                            │ Continuous Stage Reading
                            ▼
 ┌──────────────────────────────────────────────────────────┐
-│ STAGE 4: Rate-of-Change (dH/dt) Sanity Clamping          │
+│ STAGE 5: Rate-of-Change (dH/dt) Sanity Clamping          │
 │ Blocks physical step jumps exceeding 0.10 ft / step      │
 └──────────────────────────────────────────────────────────┘
 ```
 
-1. **Frame Confidence Gate**  
-   Discards individual frames if tick mark contrast drops below $C_{\text{min}} = 110$, preventing glare or splash spikes.
+1. **Quantized Mark-Distortion Filter**
+   Evaluates staff-mark contrast and edge gradients to locate the optical transition, then snaps the frame reading to the configured $0.01\text{ ft}$ grid. `main/vision_detector.cpp` implements the fixed-crop proof-of-concept version.
 
-2. **Burst $\alpha$-Trimmed Mean & Median Filter**  
-   Sorts valid frames in a 10- to 30-frame burst, trims the top/bottom 20% (wave crests/troughs), and averages the middle 60%. This eliminates 100% of surface ripple jitter with 50% breakdown immunity to outliers.
+2. **Frame Confidence Gate**
+   The intended field gate rejects frames whose raw tick contrast falls below $C_{\text{min}} = 110$, preventing glare or splash spikes. The proof of concept instead passes the detector's normalized confidence ($\text{contrast}/150$, clamped to 0.10–1.00) to `BurstFilter`, which accepts values of at least 0.30. Its raw 100/110 stripe thresholds select a quantized level; they are not the confidence-gate threshold.
 
-3. **IIR Exponential Moving Average (EMA)**  
+3. **Burst $\alpha$-Trimmed Mean & Median Filter**
+   The intended field design sorts valid readings from a 10- to 30-frame burst, trims the top/bottom 20% (wave crests/troughs), and averages the middle 60%. The proof of concept finalizes consecutive 10-frame chunks from its 169-frame corpus. Both calculate a median; the proof of concept logs it and feeds the trimmed mean forward.
+
+4. **IIR Exponential Moving Average (EMA)**
    Smooths consecutive burst measurements over logging intervals:
    $$H_{\text{smooth}}[t] = 0.25 \cdot H_{\text{burst}}[t] + 0.75 \cdot H_{\text{smooth}}[t-1]$$
+   The proof of concept applies this EMA after each 10-frame chunk, not at a field logging interval.
 
-4. **Rate-of-Change ($dH/dt$) Clamping**  
-   Rejects step changes exceeding physical flume limits ($|\Delta H| > 0.10\text{ ft/step}$) to block floating debris, leaves, or birds.
+5. **Rate-of-Change ($dH/dt$) Clamping**
+   Rejects step changes exceeding physical flume limits ($|\Delta H| > 0.10\text{ ft/step}$) to block floating debris, leaves, or birds. The proof of concept applies the same $0.10\text{ ft}$ limit between each chunk's trimmed mean and the prior accepted smoothed value.
 
 ---
 
@@ -85,7 +95,7 @@ Firmware revision `ff2602b` was built, flashed, and run against its embedded 169
 * **DSP Filtered Level Convergence:** **$\mathbf{0.08\text{ ft}}$ ($0.96\text{ inches}$)**
 * **Visual Audit Output:** SPIFFS reported successful storage of the 24-bit RGB bitmap at `/images/clean_reference.bmp`.
 
-Benchmark timing currently includes a progress log every ten frames, so console transport materially affects the result. These observations validate the complete fixed-corpus proof-of-concept loop, not algorithm-only throughput, live camera capture, or field measurement accuracy.
+Benchmark timing starts before the first frame and ends after the final frame, so it includes a progress log every ten frames but excludes the subsequent BMP write. Console transport therefore materially affects the result. These observations validate the fixed-corpus proof-of-concept loop, not algorithm-only throughput, live camera capture, field measurement accuracy, or retrieval of the SPIFFS artifact.
 
 ---
 
