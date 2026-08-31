@@ -45,7 +45,8 @@ graph TD
 | Water head | Primary non-contact camera vision on ESP32-S3 using mark-distortion transition tracking and DSP burst filtering on the $H_a$ staff gauge; optional vented 4–20 mA pressure/ultrasonic sensor fallback. |
 | Flow | Determine submergence from simultaneous upstream ($H_a$) and downstream ($H_b$) dual camera vision readings; apply the certified free-flow limit and submerged-flow correction when required. |
 | Temperature | 316L stainless Pt100 RTD, Class A or 1/3-DIN, IP68, with a 3-wire interface; second RTD for enclosure/air temperature. |
-| Historic data | Timestamped records in a wear-leveled flash/SD ring log; store last reading and annual total separately in NVS. |
+| Historic data | Timestamped CSV records and 15-min annotated JPEG audit photos in a wear-leveled MicroSD card / SPIFFS ring log. |
+| Field Retrieval | **Plug-and-Play USB Mass Storage (MSC) Drive Volume:** Connecting a USB-C cable from a laptop mounts the MicroSD filesystem directly as a USB flash drive (`BRADY_FLUME/`), enabling drag-and-drop log and JPEG audit image downloads. |
 | Display | Small low-power e-paper display showing head, flow, daily/annual volume, temperature, battery, and sensor health. |
 | Power | 24 V battery through a fused, reverse-polarity- and surge-protected buck converter. The solar panel must charge the battery through a suitable charge controller; it must not feed the ESP32 supply directly. |
 

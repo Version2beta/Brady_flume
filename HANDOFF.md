@@ -8,7 +8,7 @@
 - **Benchmark Performance:** Evaluated live on 169 un-downsampled 1:1 scale field video frames from `IMG_2278.MOV` at **855.6 FPS** (1.169 ms/frame). The DSP burst median converges to **$0.08\text{ ft}$ ($0.96\text{ in}$)** (68% mode frequency).
 - **Multi-Node Architecture:** $H_a$ primary and $H_b$ submergence camera head nodes use Seeed Studio XIAO ESP32S3 Sense boards inside compact IP67 clear-lid polycarbonate junction boxes ($50 \times 50 \times 35\text{ mm}$) with MAX3490 RS-422 transceivers, communicating over a 4-wire shielded cable to the main solar enclosure.
 - **Night Optics & Lighting:** A single shared off-axis IP67 850nm IR spotlight mounted 2–3 feet to the side of the flume illuminates both $H_a$ and $H_b$ staff gauges simultaneously without causing sensor-blinding glare.
-- **Visual Audit Storage:** The ESP32 mounts SPIFFS and stores 24-bit RGB annotated audit bitmaps at `/images/clean_reference.bmp`.
+- **Visual Audit Storage & Field Retrieval:** The ESP32 mounts SPIFFS / MicroSD and stores 24-bit RGB annotated audit bitmaps at `/images/clean_reference.bmp`. When plugged into a laptop over USB-C, the ESP32-S3 operates as a **USB Mass Storage Class (MSC) flash drive**, allowing plug-and-play drag-and-drop file downloads (`BRADY_FLUME/`).
 - **Flow Engine:** `main/flow.c` provides $Q = C \cdot H^n$ conversion and cfs-to-acre-foot integration. Flow conversion is held until certified Parshall rating coefficients are set in `main/installation_config.h`.
 
 ---

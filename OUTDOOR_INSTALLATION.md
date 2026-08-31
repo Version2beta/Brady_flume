@@ -77,7 +77,7 @@ This baseline applies to the Brady Ditch Parshall-flume monitor. It establishes 
 - **Visual Audit Image Retention:** For every 15-minute logging burst, the ESP32 selects the single representative median frame, annotates it with a red waterline at the $0.01\text{ ft}$ mark, and saves it as a 15 KB JPEG (`/images/audit_YYYYMMDD_HHMMSS_0.08ft.jpg`).
 - **Primary SD Card Storage ($32\text{ GB}$):** Retains over 100 years of visual audit photos (300 MB per 7-month irrigation season).
 - **Internal Flash Fallback (4 MB SPIFFS):** FIFO ring buffer retaining the last 250 audit photos (~2.5 days) if no SD card is present.
-- **USB Service Retrieval:** Technicians connect a laptop to USB-C (`/dev/cu.usbmodem3101`) to pull audit images for visual verification against manual logs.
+- **Plug-and-Play USB Mass Storage (MSC) Retrieval:** When a technician plugs a USB-C cable from a laptop into the ESP32-S3, the MicroSD card mounts directly as a standard USB flash drive volume (`BRADY_FLUME/`). Technicians drag-and-drop CSV flow logs and JPEG audit photos onto their laptop without needing terminal commands or custom software.
 - **Temperature Sensors:** Air temperature Pt100 RTD in a 6-plate solar radiation shield; water temperature Pt100 RTD in flume sidewall.
 - **Time Synchronization & Flow Accounting:** RTC timekeeping with nonvolatile total recovery. Flow accounting remains disabled until certified Parshall rating coefficients are entered.
 
