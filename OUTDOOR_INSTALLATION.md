@@ -18,10 +18,11 @@ This baseline applies to the Brady Ditch Parshall-flume monitor. It establishes 
 - **Anti-Fog Window Protection:** Mini 1-gram silica gel desiccant packets sealed inside each camera cylinder prevent internal moisture from fogging the optical glass window during freezing Utah winter snaps.
 - **Liquid-Tight Cable Entry:** IP68 PG7 compression cable glands seal the 4-wire shielded cable (12V Power + RS-422 pair) exiting the rear of the camera housing. External drip loops ensure rainwater falls away from the gland.
 
-### 3. Night Optics & Standalone Off-Axis IR Spotlight
-- **CRITICAL OPTICAL REQUIREMENT:** Because staff gauge face paint is intentionally retroreflective, mounting an IR light source on the exact same axis as the camera lens causes a blinding white reflection that completely obliterates the black tick marks.
-- **Off-Axis Spotlight:** A standalone IP67 850nm IR Illuminator Spotlight is mounted **2–3 feet off-axis (to the side)** of each camera housing. This casts light at an angle, providing deep contrast on the black graduation marks without sensor-blinding glare.
-- **Gated Power:** The IR spotlight is energized via a MOSFET/relay for only 2 seconds per 15-minute logging burst to preserve solar battery power.
+### 3. Dual Night Optics & Standalone Off-Axis IR Spotlights ($H_a$ & $H_b$)
+- **CRITICAL OPTICAL REQUIREMENT:** Because staff gauge face paint is intentionally retroreflective, mounting an IR light source on the exact same axis as the camera lens causes a blinding white glare reflection that completely obliterates the black tick marks.
+- **Dual Off-Axis Spotlights:** Two standalone IP67 850nm IR Illuminator Spotlights are required (one for $H_a$ primary staff gauge and one for $H_b$ submergence staff gauge).
+- **Mounting Position:** Each spotlight is mounted on a horizontal cross-arm **2 to 3 feet horizontally off-axis (to the side)** from its corresponding camera head housing, aimed at a $15^\circ\text{ to }30^\circ$ angle toward the staff gauge face.
+- **Gated Power Control:** Both IR spotlights are switched via a MOSFET/relay output on the main controller, energized for only 2 seconds per 15-minute nighttime logging burst to conserve solar battery capacity.
 
 ### 4. Temperature Sensors & Radiation Shield
 - **Air Temperature RTD:** Evolution Sensors P3A-S316-250-PX-3-PFXX-40-STWL 3-wire Class A Pt100 probe. The 3-inch 316 SS sheath is mounted in a stainless compression fitting below the enclosure, with the sensing tip housed inside a **6-plate ventilated solar radiation shield** to prevent direct sunlight from skewing air temperature readings.
