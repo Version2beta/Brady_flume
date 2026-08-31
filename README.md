@@ -42,6 +42,9 @@ The Brady Ditch Flume Monitor is an intended solar-powered water recorder for a 
 * [`POWER_SYSTEM.md`](POWER_SYSTEM.md)
   Preliminary April–October solar/battery-bank topology, protected parallel-pack interconnect, Molex VersaBlade harness components, and outstanding power-system validation.
 
+* [`ROADMAP.md`](ROADMAP.md)
+  Broad implementation path from the current vision proof of concept through field commissioning and operational acceptance.
+
 * [`VISION_ALGORITHM.md`](VISION_ALGORITHM.md)  
   Technical specification for the $0.01\text{ ft}$ Submerged Mark Distortion Transition algorithm, off-axis IR lighting physics rule, and the five-stage vision/DSP pipeline: quantized mark-distortion, confidence gate, burst filter, EMA, and rate clamp.
 
