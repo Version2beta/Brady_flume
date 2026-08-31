@@ -59,10 +59,16 @@ This baseline applies to the Brady Ditch Parshall-flume monitor. It establishes 
 
 ## Power, Grounding, and Surge Protection
 
-- **Power Architecture:** 24V AGM/LiFePO4 battery charged via a properly sized solar panel and MPPT solar charge controller.
-- **Circuit Protection:** Fused branches on all battery and solar lines, reverse-polarity protection, and regulated DC-DC conversion for logic power.
+- **Solar Battery Bank:** 24V AGM or LiFePO4 battery bank charged via a 24V MPPT solar charge controller. Raw solar battery voltage fluctuates between $22.0\text{V}$ (discharged) and $29.2\text{V}$ (charging peak).
+- **Central Regulated 24V-to-12V Industrial DC-DC Converter (Selected):**  
+  A DIN-rail mounted industrial DC-DC buck converter (**Mean Well DDR-15G-12** or **Victron Orion 24/12-10**) sits immediately downstream of the battery fuses.
+  * **Input:** $18\text{V to }36\text{V DC}$ (accepts raw solar battery fluctuation).
+  * **Output:** Clean, short-circuit and surge-protected **$12.0\text{V DC}$ regulated power bus**.
+  * **Distribution:** Supplies clean 12V DC power to the main ESP32-S3 controller board, E-Ink display, 3-wire RTD front ends, RS-422 bus, camera head nodes over the 6-conductor cable, and gated 850nm IR spotlight.
+  * **Local Node Step-Down:** Each Seeed XIAO ESP32S3 camera head node steps down the clean 12V DC rail to $3.3\text{V DC}$ locally using its onboard buck regulator.
+- **Circuit Protection:** Fused branches on all 24V and 12V lines, reverse-polarity diode protection, and thermal shutdown.
 - **Surge & Lightning Protection:** Listed DIN-rail surge protectors on incoming solar and RS-422 field cables bonded to a copper grounding rod.
-- **Shielding:** 4-wire shielded twisted-pair cables for RS-422 camera communication, grounded at the main enclosure end to prevent ground loops.
+- **Cable Shielding:** 6-conductor (3 twisted-pair) 22 AWG outdoor shielded cable carries full-duplex RS-422 data pairs and clean 12V power to the cross-arm assembly, grounded at the main enclosure end to prevent ground loops.
 
 ---
 
